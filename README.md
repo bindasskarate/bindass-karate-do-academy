@@ -1,0 +1,1 @@
+# bindass-karate-do-academy
