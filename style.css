@@ -576,9 +576,9 @@ section.hero {
 .hero-image img {
     width: 100%;
     max-width: 1200px;
-    height: 650px;
+    height: 460px;
     object-fit: cover;
-    display: block;
+    display: flex;
     margin: auto;
     border-radius: 12px;
 }
