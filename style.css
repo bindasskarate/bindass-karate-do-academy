@@ -695,3 +695,14 @@ section.hero {
         line-height: 1.5;
     }
 }
+/* Fix Join Now and About Us spacing */
+
+.hero button {
+    margin: 20px auto 40px;
+    display: block;
+}
+
+#about,
+.about {
+    margin-top: 40px;
+}
