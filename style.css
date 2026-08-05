@@ -475,7 +475,7 @@ body {
     background-attachment: scroll !important;
 }
 
-/* Make hero show the same background */
+
 .hero,
 section.hero {
     background-color: transparent !important;
