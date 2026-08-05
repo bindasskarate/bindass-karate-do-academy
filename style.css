@@ -501,7 +501,7 @@ section.hero {
         background-image: url("karatehomepage.jpeg") !important;
         background-size: 100% auto !important;
         background-position: center top !important;
-        min-height: 1000px;
+        min-height: 2000px;
     }
 
     .hero h1 {
