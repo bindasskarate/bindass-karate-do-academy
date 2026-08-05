@@ -4,7 +4,7 @@ html{
 body {
     margin: 0;
     background-color: black;
-    background-image: url("images/karatehomepage.jpeg");
+    background-image: url("karatehomepage.jpeg");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -135,7 +135,7 @@ section p {
 background:
 linear-gradient(rgba(0,0,0,0.65),
 rgba(0,0,0,0.65)),
-url("images/karatehomepage.jpeg");
+url("karatehomepage.jpeg");
     background-size: cover;
     background-position: center;
     height: 600px;
