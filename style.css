@@ -2,11 +2,16 @@ html{
     scroll-behavior: smooth;
 }
 body {
-    background-color:black;
+    margin: 0;
+    background-color: black;
+    background-image: url("images/karatehomepage.jpeg");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
     color: white;
     font-family: Arial, sans-serif;
     text-align: center;
-
     padding-top: 120px;
 }
 
