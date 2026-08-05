@@ -462,7 +462,7 @@ section,
     background: transparent !important;
 }
 body {
-    background-image: url("images/karatehomepage.jpeg") !important;
+    background-image: url("karatehomepage.jpeg") !important;
     background-size: cover !important;
     background-position: center !important;
     background-repeat: no-repeat !important;
