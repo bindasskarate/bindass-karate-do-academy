@@ -463,8 +463,8 @@ section,
 }
 body {
     background-image: url("karatehomepage.jpeg") !important;
-    background-size: cover !important;
-    background-position: center !important;
+    background-size: 100% auto !important;
+    background-position: top center !important;
     background-repeat: no-repeat !important;
     background-attachment: scroll !important;
 }
