@@ -457,3 +457,7 @@ footer a:hover {
         padding: 12px 24px;
     }
 }
+section,
+.hero {
+    background: transparent !important;
+}
