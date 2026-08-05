@@ -461,3 +461,10 @@ section,
 .hero {
     background: transparent !important;
 }
+body {
+    background-image: url("images/karatehomepage.jpeg") !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: scroll !important;
+}
