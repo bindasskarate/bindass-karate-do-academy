@@ -58,6 +58,44 @@ button {
 button:hover {
     background-color: darkred;
 }
+/* MOBILE VERSION */
+@media (max-width: 600px) {
+
+    nav {
+        padding: 20px 10px;
+    }
+
+    nav h2 {
+        font-size: 22px;
+        margin-bottom: 15px;
+    }
+
+    nav a {
+        display: inline-block;
+        font-size: 16px;
+        margin: 5px 7px;
+    }
+
+    h1 {
+        font-size: 38px;
+        line-height: 1.15;
+        margin: 40px 20px 15px;
+    }
+
+    h2 {
+        font-size: 22px;
+    }
+
+    p {
+        font-size: 16px;
+        line-height: 1.6;
+    }
+
+    button {
+        font-size: 16px;
+        padding: 12px 24px;
+    }
+}
 button {
     background-color: red;
     color: white;
