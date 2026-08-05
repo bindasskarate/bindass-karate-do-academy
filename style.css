@@ -590,7 +590,7 @@ section.hero {
 .hero-image img {
     width: 100%;
     max-width: 1200px;
-    height: 420px;
+    height: 650px;
     object-fit: cover;
     display: block;
     margin: auto;
