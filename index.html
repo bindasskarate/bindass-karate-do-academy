@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="style.css">
+    <title>Bindass Karate Do Academy</title>
+</head>
+
+<body>
+
+<nav class="main-nav">
+
+    <div class="nav-brand">
+        <img src="bindasslogo.jpeg" alt="Bindass Karate Do Academy">
+        <span>Bindass Karate Do Academy</span>
+    </div>
+
+    <button class="menu-toggle" id="menuToggle" aria-label="Open Menu">
+        ☰
+    </button>
+
+    <div class="nav-menu" id="navMenu">
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#classes">Classes</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#contact">Contact</a>
+    </div>
+
+</nav>
+
+<section id="home" class="hero">
+
+    <!-- SEPARATE IMAGE -->
+    <div class="hero-image">
+        <img src="karatehomepage.jpeg" alt="Bindass Karate Do Academy">
+    </div>
+
+    <!-- SEPARATE TEXT AREA -->
+    <div class="hero-content">
+
+        <img
+            src="bindasslogo.jpeg"
+            class="hero-logo"
+            alt="Bindass Karate Do Academy Logo"
+        >
+
+        <h1>
+            BINDASS KARATE DO ACADEMY
+        </h1>
+
+        <p>
+            Discipline • Respect • Excellence
+        </p>
+
+        <a href="#register" class="join-btn">
+            Join Now
+        </a>
+
+    </div>
+
+</section>
+<p>
+
+</p>
+<section id="about" class="about">
+    <h2>About Us</h2>
+
+    <p>
+        Bindass Karate Do Academy is dedicated to developing discipline,
+        confidence, fitness, and self-defense skills through traditional karate.
+        We train students of all ages under experienced instructors.
+    </p>
+</section>
+<section id="classes" class="classes">
+
+    <h2>Our Classes</h2>
+
+    <div class="class-container">
+
+        <div class="class-card">
+            <h3>🥋 Kids Karate</h3>
+            <p>Fun and disciplined training for children.</p>
+        </div>
+
+        <div class="class-card">
+            <h3>🥊 Self Defence</h3>
+            <p>Learn practical self-defence techniques.</p>
+        </div>
+
+        <div class="class-card">
+            <h3>🏆 Competition Training</h3>
+            <p>Special coaching for tournaments.</p>
+        </div>
+
+    </div>
+
+</section>
+<section id="gallery" class="gallery">
+    <h2>Gallery</h2>
+
+    <div class="gallery-container">
+
+    <a href="karate1.jpg.jpeg" target="_blank">
+        <img src="karate1.jpg.jpeg" alt="MOMENTS">
+    </a>
+
+    <a href="karate2.jpg" target="_blank">
+        <img src="karate2.jpg" alt="MOMENTS">
+    </a>
+
+    <a href="karate3.jpg" target="_blank">
+        <img src="karate3.jpg" alt="MOMENTS">
+    </a>
+
+    <a href="karate4.jpg" target="_blank">
+        <img src="karate4.jpg" alt="MOMENTS">
+    </a>
+
+    <a href="karate5.jpg" target="_blank">
+        <img src="karate5.jpg" alt="MOMENTS">
+    </a>
+
+    <a href="karate6.jpg" target="_blank">
+        <img src="karate6.jpg" alt="MOMENTS">
+    </a>
+
+    <a href="karate7.jpg" target="_blank">
+        <img src="karate7.jpg" alt="MOMENTS">
+    </a>
+
+</div>
+</section>
+<section id="contact" class="contact">
+    <h2>Contact Us</h2>
+
+    <p><strong>📍 Address:</strong> Satgaon, Guwahati, Assam</p>
+    <p><strong>📞 Phone:</strong> 7636885457 / 9365061525</p>
+    <p><strong>📧 Email:</strong> bindasskaratedoacademy@gmail.com</p>
+
+    <a href="https://wa.me/917636885457">
+        <button>Chat on WhatsApp</button>
+    </a>
+</section>
+<section id="register" class="register">
+    <h2>Join Bindass Karate Do Academy</h2>
+
+    <form id="registrationForm">
+        <input type="text" name="name" placeholder="Full Name" required>
+        <input type="number" name="age" placeholder="Age" required>
+        <input type="tel" name="phone" placeholder="Phone Number" required>
+        <input type="email" name="email" placeholder="Email Address" required>
+        
+        <button type="submit">Register Now</button>
+    </form>
+</section>
+
+
+
+<section class="stats">
+    <div class="stat">
+        <h2>200+</h2>
+        <p>Students</p>
+    </div>
+
+    <div class="stat">
+        <h2>80+</h2>
+        <p>Achievements</p>
+    </div>
+
+
+    <div class="stat">
+        <h2>3+</h2>
+        <p>Years Experience</p>
+    </div>
+</section>
+<footer>
+    <p> &copy; 2026 Bindass Karate Do Academy. All Rights Reserved.</p>
+
+    <p>
+        📍 Satgaon, Guwahati, Assam |
+        📞 7636885457 |
+        ✉️ bindasskaratedoacademy@gmail.com
+    </p>
+
+    <p>Follow Us:
+        <a href="#https://www.facebook.com/share/19F9ygiDNW/">Facebook</a> |
+        <a href="#https://www.instagram.com/bindass_karate_do_academy?igsh=MThmYXl3aGk4aTdkdA==">Instagram</a> |
+        <a href="#https://youtube.com/@bindasskaratedoacademy?si=9XUFFp447L-V3h0Q">YouTube</a>
+    </p>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<script src="script.js"></script>
+
+<script>
+emailjs.init("NXj9ZCvT04vq6aAcq");
+
+document.getElementById("registrationForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    emailjs.sendForm(
+        "service_d7vpkda",
+        "template_uv8ktsi",
+        this
+    ).then(function() {
+        alert("Registration Successful!");
+    }).catch(function(error) {
+        alert("Error sending registration.");
+        console.log(error);
+    });
+});
+</script>
+<!-- Image Popup -->
+<div id="lightbox" class="lightbox">
+    <span class="close">&times;</span>
+    <img class="lightbox-content" id="lightbox-img">
+</div>
+</body>
+</html>
