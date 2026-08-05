@@ -474,3 +474,63 @@ body {
         background-position: top center !important;
     }
 }
+/* ===== FINAL RESPONSIVE FIX ===== */
+
+html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+}
+
+body {
+    background-color: #000 !important;
+    background-image: url("karatehomepage.jpeg") !important;
+    background-size: cover !important;
+    background-position: center top !important;
+    background-repeat: no-repeat !important;
+    background-attachment: scroll !important;
+}
+
+/* Make hero show the same background */
+.hero,
+section.hero {
+    background-color: transparent !important;
+    background-image: url("karatehomepage.jpeg") !important;
+    background-size: cover !important;
+    background-position: center top !important;
+    background-repeat: no-repeat !important;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+
+    body {
+        background-image: url("karatehomepage.jpeg") !important;
+        background-size: cover !important;
+        background-position: center top !important;
+        background-attachment: scroll !important;
+    }
+
+    .hero,
+    section.hero {
+        background-color: transparent !important;
+        background-image: url("karatehomepage.jpeg") !important;
+        background-size: cover !important;
+        background-position: center top !important;
+        min-height: 650px;
+    }
+
+    .hero h1 {
+        font-size: 42px !important;
+        line-height: 1.15 !important;
+    }
+
+    .hero p {
+        font-size: 20px !important;
+    }
+
+    .hero-logo {
+        width: 90px !important;
+        height: 90px !important;
+    }
+}
