@@ -468,3 +468,9 @@ body {
     background-repeat: no-repeat !important;
     background-attachment: scroll !important;
 }
+@media (max-width: 600px) {
+    body {
+        background-size: 100% auto !important;
+        background-position: top center !important;
+    }
+}
