@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Students | Bindass Karate Do Academy</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f5f7;
+            color: #222;
+            padding: 25px;
+        }
+
+        .header {
+            background: #111;
+            color: white;
+            padding: 22px;
+            border-radius: 14px;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            margin-bottom: 6px;
+        }
+
+        .header p {
+            color: #bbb;
+        }
+
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .search {
+            flex: 1;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .add-btn {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #111;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #ddd;
+        }
+
+        .stat p {
+            color: #777;
+            font-size: 14px;
+        }
+
+        .stat h2 {
+            margin-top: 8px;
+            font-size: 28px;
+        }
+
+        .table-box {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 3px 12px #ddd;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f7f7f7;
+        }
+
+        .status {
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            background: #e8f5e9;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #111;
+            font-weight: bold;
+        }
+
+        @media (max-width: 650px) {
+
+            body {
+                padding: 15px;
+            }
+
+            .top {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .add-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>👥 Student Management</h1>
+        <p>Bindass Karate Do Academy</p>
+    </div>
+
+    <div class="top">
+
+        <input
+            type="text"
+            class="search"
+            id="searchStudent"
+            placeholder="🔍 Search student by name..."
+        >
+
+        <button class="add-btn">
+            + Add Student
+        </button>
+
+    </div>
+
+    <div class="stats">
+
+        <div class="stat">
+            <p>Total Students</p>
+            <h2 id="totalStudents">0</h2>
+        </div>
+
+        <div class="stat">
+            <p>Active Students</p>
+            <h2 id="activeStudents">0</h2>
+        </div>
+
+        <div class="stat">
+            <p>Inactive Students</p>
+            <h2 id="inactiveStudents">0</h2>
+        </div>
+
+    </div>
+
+    <div class="table-box">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Belt</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody id="studentList">
+
+                <tr>
+                    <td>Test Student</td>
+                    <td>test@example.com</td>
+                    <td>9999999999</td>
+                    <td>White Belt</td>
+                    <td>
+                        <span class="status">Active</span>
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <a href="admin.html" class="back">
+        ← Back to Admin Dashboard
+    </a>
+<script type="module">
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+    import {
+        getFirestore,
+        collection,
+        getDocs
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+    // 🔥 YOUR FIREBASE CONFIG
+    const firebaseConfig = {
+        apiKey: "AIzaSyCDpKF59MATfa-JaGF9yOBvHyi8i__3CFc",
+        authDomain: "bindass-karate-do-academy.firebaseapp.com",
+        projectId: "bindass-karate-do-academy",
+        storageBucket: "bindass-karate-do-academy.firebasestorage.app",
+        messagingSenderId: "360953215088",
+        appId: "1:360953215088:web:c4399bcd991abf98229cb5",
+        measurementId: "G-FWLX780V9Q"
+    };
+
+
+   const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+    async function loadStudents() {
+
+        const studentList = document.getElementById("studentList");
+
+        studentList.innerHTML = "";
+
+        try {
+
+            const snapshot = await getDocs(
+                collection(db, "students")
+            );
+
+            let total = 0;
+            let active = 0;
+            let inactive = 0;
+
+            snapshot.forEach((doc) => {
+
+                const student = doc.data();
+
+                total++;
+
+                if (student.status === "active") {
+                    active++;
+                } else {
+                    inactive++;
+                }
+
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+                    <td>${student.name || "-"}</td>
+                    <td>${student.email || "-"}</td>
+                    <td>${student.phone || "-"}</td>
+                    <td>${student.belt || "-"}</td>
+                    <td>
+                        <span class="status">
+                            ${student.status || "-"}
+                        </span>
+                    </td>
+                `;
+
+                studentList.appendChild(row);
+
+            });
+
+
+            document.getElementById("totalStudents").textContent = total;
+
+            document.getElementById("activeStudents").textContent = active;
+
+            document.getElementById("inactiveStudents").textContent = inactive;
+
+
+        } catch (error) {
+
+            console.error("Error loading students:", error);
+
+            studentList.innerHTML = `
+                <tr>
+                    <td colspan="5">
+                        Unable to load students.
+                    </td>
+                </tr>
+            `;
+
+        }
+
+    }
+
+
+    loadStudents();
+
+</script>
+</body>
+</html>
