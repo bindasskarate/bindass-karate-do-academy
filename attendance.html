@@ -293,6 +293,12 @@ async function loadStudents(){
             collection(db, "students")
         );
 
+        console.log("STUDENTS FOUND:", snapshot.size);
+console.log(
+    "STUDENTS DATA:",
+    snapshot.docs.map(doc => doc.data())
+);
+
         students = [];
 
         snapshot.forEach((studentDoc) => {
