@@ -220,13 +220,6 @@ window.loadHistory = async function() {
 };
 
 
-onAuthStateChanged(auth, (user) => {
-
-    if (!user) {
-        historyList.innerHTML = "❌ Please login first.";
-    }
-
-});
 
 </script>
 
