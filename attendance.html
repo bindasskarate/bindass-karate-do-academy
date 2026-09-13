@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attendance | Bindass Karate Do Academy</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f3f4f6;
+    color:#222;
+}
+
+.header{
+    background:#111;
+    color:white;
+    padding:18px;
+    text-align:center;
+}
+
+.header h1{
+    margin:0;
+    font-size:24px;
+}
+
+.container{
+    max-width:1000px;
+    margin:20px auto;
+    padding:0 15px;
+}
+
+.topbar{
+    background:white;
+    padding:15px;
+    border-radius:12px;
+    margin-bottom:15px;
+    box-shadow:0 2px 10px #0001;
+}
+
+.controls{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+}
+
+input[type="date"]{
+    padding:11px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    font-size:16px;
+}
+
+button{
+    border:0;
+    border-radius:8px;
+    padding:11px 16px;
+    font-size:15px;
+    cursor:pointer;
+}
+
+.present-all{
+    background:#16a34a;
+    color:white;
+}
+
+.reset{
+    background:#e5e7eb;
+}
+
+.save{
+    background:#111;
+    color:white;
+    font-weight:bold;
+}
+
+.summary{
+    margin-top:12px;
+    font-weight:bold;
+}
+
+.student{
+    background:white;
+    margin-bottom:8px;
+    padding:12px 15px;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    box-shadow:0 1px 5px #0001;
+}
+
+.student-info{
+    min-width:0;
+}
+
+.student-name{
+    font-weight:bold;
+    font-size:16px;
+}
+
+.student-phone{
+    color:#777;
+    font-size:13px;
+    margin-top:3px;
+}
+
+.status-buttons{
+    display:flex;
+    gap:6px;
+}
+
+.status-btn{
+    min-width:85px;
+    padding:9px 12px;
+}
+
+.present{
+    background:#dcfce7;
+    color:#15803d;
+}
+
+.absent{
+    background:#fee2e2;
+    color:#b91c1c;
+}
+
+.status-btn.selected.present{
+    background:#16a34a;
+    color:white;
+}
+
+.status-btn.selected.absent{
+    background:#dc2626;
+    color:white;
+}
+
+#loading{
+    text-align:center;
+    padding:30px;
+}
+
+@media(max-width:600px){
+    .student{
+        padding:12px;
+    }
+
+    .status-buttons{
+        flex-shrink:0;
+    }
+
+    .status-btn{
+        min-width:65px;
+        padding:9px 8px;
+        font-size:13px;
+    }
+
+    .student-name{
+        font-size:15px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>🥋 Bindass Karate Do Academy</h1>
+    <div>Attendance Management</div>
+</div>
+
+<div class="container">
+
+    <div class="topbar">
+
+        <div class="controls">
+
+            <input type="date" id="attendanceDate">
+
+            <button class="present-all" id="markAllPresent">
+                ✓ Mark All Present
+            </button>
+
+            <button class="reset" id="resetAttendance">
+                Reset
+            </button>
+
+            <button class="save" id="saveAttendance">
+                💾 Save Attendance
+            </button>
+
+        </div>
+
+        <div class="summary">
+            Total: <span id="totalCount">0</span>
+            &nbsp; | &nbsp;
+            Present: <span id="presentCount">0</span>
+            &nbsp; | &nbsp;
+            Absent: <span id="absentCount">0</span>
+        </div>
+
+    </div>
+
+    <div id="loading">Loading students...</div>
+
+    <div id="studentList"></div>
+
+</div>
+
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+import {
+    getFirestore,
+    collection,
+    getDocs,
+    doc,
+    setDoc,
+    getDoc
+}
+from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+import {
+    getAuth,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+
+/* FIREBASE CONFIG */
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCDpKF59MATfa-JaGF9yOBvHyi8i_3CFc",
+    authDomain: "bindass-karate-do-academy.firebaseapp.com",
+    projectId: "bindass-karate-do-academy",
+    storageBucket: "bindass-karate-do-academy.firebasestorage.app",
+    messagingSenderId: "360953215088",
+    appId: "1:360953215088:web:6439bed9901abf98229cb5",
+    measurementId: "G-FWLX780V9Q"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+onAuthStateChanged(auth, (user) => {
+    console.log("AUTH USER:", user);
+
+    if (!user) {
+        alert("Please login first.");
+        window.location.href = "login.html";
+        return;
+    }
+
+    loadStudents();
+});
+
+/* ELEMENTS */
+
+const attendanceDate = document.getElementById("attendanceDate");
+const studentList = document.getElementById("studentList");
+const loading = document.getElementById("loading");
+
+const totalCount = document.getElementById("totalCount");
+const presentCount = document.getElementById("presentCount");
+const absentCount = document.getElementById("absentCount");
+
+const markAllPresent = document.getElementById("markAllPresent");
+const resetAttendance = document.getElementById("resetAttendance");
+const saveAttendance = document.getElementById("saveAttendance");
+
+
+let students = [];
+let attendance = {};
+
+
+/* TODAY */
+
+const today = new Date().toISOString().split("T")[0];
+attendanceDate.value = today;
+
+
+/* LOAD STUDENTS */
+
+async function loadStudents(){
+
+    try{
+
+        const snapshot = await getDocs(
+            collection(db, "students")
+        );
+
+        students = [];
+
+        snapshot.forEach((studentDoc) => {
+
+            const data = studentDoc.data();
+
+            // Only active students
+            if(data.status === "Active"){
+
+                students.push({
+                    id: studentDoc.id,
+                    ...data
+                });
+
+            }
+
+        });
+
+        students.sort((a,b) =>
+            (a.name || "").localeCompare(b.name || "")
+        );
+
+        loading.style.display = "none";
+
+        await loadExistingAttendance();
+
+        renderStudents();
+
+    }catch(error){
+
+        console.error(error);
+
+        loading.innerHTML =
+            "❌ Unable to load students. Check Firebase connection.";
+
+    }
+
+}
+
+
+/* LOAD EXISTING ATTENDANCE */
+
+async function loadExistingAttendance(){
+
+    attendance = {};
+
+    const date = attendanceDate.value;
+
+    try{
+
+        const attendanceRef = doc(
+            db,
+            "attendance",
+            date
+        );
+
+        const attendanceDoc = await getDoc(attendanceRef);
+
+        if(attendanceDoc.exists()){
+
+            const data = attendanceDoc.data();
+
+            attendance = data.records || {};
+
+        }
+
+    }catch(error){
+
+        console.log("No previous attendance found.");
+
+    }
+
+}
+
+
+/* RENDER STUDENTS */
+
+function renderStudents(){
+
+    studentList.innerHTML = "";
+
+    students.forEach((student,index) => {
+
+        const status =
+            attendance[student.id] || "Present";
+
+        const div = document.createElement("div");
+
+        div.className = "student";
+
+        div.innerHTML = `
+
+            <div class="student-info">
+
+                <div class="student-name">
+                    ${index + 1}. ${escapeHTML(student.name || "Unnamed Student")}
+                </div>
+
+                <div class="student-phone">
+                    ${escapeHTML(student.phone || "")}
+                </div>
+
+            </div>
+
+            <div class="status-buttons">
+
+                <button
+                    class="status-btn present ${status === "Present" ? "selected" : ""}"
+                    data-id="${student.id}"
+                    data-status="Present">
+                    ✓ Present
+                </button>
+
+                <button
+                    class="status-btn absent ${status === "Absent" ? "selected" : ""}"
+                    data-id="${student.id}"
+                    data-status="Absent">
+                    ✕ Absent
+                </button>
+
+            </div>
+
+        `;
+
+        studentList.appendChild(div);
+
+    });
+
+    document.querySelectorAll(".status-btn")
+        .forEach(button => {
+
+            button.addEventListener("click", () => {
+
+                const id = button.dataset.id;
+                const status = button.dataset.status;
+
+                attendance[id] = status;
+
+                updateButtons(id);
+                updateSummary();
+
+            });
+
+        });
+
+    updateSummary();
+
+}
+
+
+/* UPDATE BUTTON */
+
+function updateButtons(id){
+
+    const buttons =
+        document.querySelectorAll(
+            `.status-btn[data-id="${id}"]`
+        );
+
+    buttons.forEach(button => {
+
+        button.classList.remove("selected");
+
+        if(button.dataset.status === attendance[id]){
+
+            button.classList.add("selected");
+
+        }
+
+    });
+
+}
+
+
+/* MARK ALL PRESENT */
+
+markAllPresent.addEventListener("click", () => {
+
+    students.forEach(student => {
+
+        attendance[student.id] = "Present";
+
+    });
+
+    renderStudents();
+
+});
+
+
+/* RESET */
+
+resetAttendance.addEventListener("click", () => {
+
+    students.forEach(student => {
+
+        attendance[student.id] = "Absent";
+
+    });
+
+    renderStudents();
+
+});
+
+
+/* DATE CHANGE */
+
+attendanceDate.addEventListener("change", async () => {
+
+    loading.style.display = "block";
+    loading.innerHTML = "Loading attendance...";
+
+    await loadExistingAttendance();
+
+    loading.style.display = "none";
+
+    renderStudents();
+
+});
+
+
+/* SAVE */
+
+saveAttendance.addEventListener("click", async () => {
+
+    if(!attendanceDate.value){
+
+        alert("Please select a date.");
+        return;
+
+    }
+
+    if(students.length === 0){
+
+        alert("No active students found.");
+        return;
+
+    }
+
+    saveAttendance.disabled = true;
+    saveAttendance.textContent = "Saving...";
+
+    try{
+
+        const date = attendanceDate.value;
+
+        await setDoc(
+            doc(db, "attendance", date),
+            {
+                date: date,
+                records: attendance,
+                totalStudents: students.length,
+                savedAt: new Date().toISOString()
+            }
+        );
+
+        alert("✅ Attendance saved successfully!");
+
+    }catch(error){
+
+        console.error(error);
+
+        alert(
+            "❌ Failed to save attendance.\n\n" +
+            error.message
+        );
+
+    }
+
+    saveAttendance.disabled = false;
+    saveAttendance.textContent = "💾 Save Attendance";
+
+});
+
+
+/* SUMMARY */
+
+function updateSummary(){
+
+    let present = 0;
+    let absent = 0;
+
+    students.forEach(student => {
+
+        if(attendance[student.id] === "Present"){
+            present++;
+        }
+
+        if(attendance[student.id] === "Absent"){
+            absent++;
+        }
+
+    });
+
+    totalCount.textContent = students.length;
+    presentCount.textContent = present;
+    absentCount.textContent = absent;
+
+}
+
+
+/* SECURITY */
+
+function escapeHTML(value){
+
+    return String(value)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+
+}
+
+
+/* START */
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+    } else {
+        loading.innerHTML = "❌ Please login first.";
+    }
+});
+
+</script>
+
+</body>
+</html>
