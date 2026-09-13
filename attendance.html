@@ -251,11 +251,13 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 onAuthStateChanged(auth, (user) => {
-    if (user) {
-        loadStudents();
-    } else {
-        loading.innerHTML = "❌ No authenticated user.";
+    if (!user) {
+        document.getElementById("loading").innerHTML =
+            "❌ Please login first.";
+        return;
     }
+
+    loadStudents();
 });
 
 /* ELEMENTS */
