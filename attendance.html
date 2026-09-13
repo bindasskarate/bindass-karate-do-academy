@@ -250,12 +250,13 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-onAuthStateChanged(auth, (user) => {
+auth.authStateReady().then(() => {
+    const user = auth.currentUser;
+
     console.log("AUTH USER:", user);
 
     if (!user) {
         alert("Please login first.");
-        window.location.href = "login.html";
         return;
     }
 
