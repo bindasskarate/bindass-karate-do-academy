@@ -254,7 +254,7 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
         loadStudents();
     } else {
-        console.log("No authenticated user yet.");
+        loading.innerHTML = "❌ No authenticated user.";
     }
 });
 
