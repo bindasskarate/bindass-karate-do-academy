@@ -175,23 +175,23 @@ window.loadHistory = async function() {
         }
 
         const data = attendanceSnap.data();
-        const records = data.records || {};
+
+const records = data.records || {};
+
+const studentNames = data.studentNames || {};
 
         let present = 0;
         let absent = 0;
 
         historyList.innerHTML = "";
 
-Object.entries(records).forEach(async ([studentId, status], index) => {
-            
+        Object.entries(records).forEach(async ([studentId, status], index) => {
+
             if (status === "Present") present++;
             if (status === "Absent") absent++;
 
-    const studentSnap = await getDoc(doc(db, "students", studentId));
-const studentName = studentSnap.exists()
-    ? studentSnap.data().name
-    : studentId;
-    
+            const studentName =
+    studentNames[studentId] || studentId;
             const div = document.createElement("div");
             div.className = "student";
 
