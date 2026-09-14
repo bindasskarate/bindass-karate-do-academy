@@ -253,7 +253,6 @@ const auth = getAuth(app);
 
    
 
-
 /* ELEMENTS */
 
 const attendanceDate = document.getElementById("attendanceDate");
@@ -538,14 +537,22 @@ saveAttendance.addEventListener("click", async () => {
         const date = attendanceDate.value;
 
         await setDoc(
-            doc(db, "attendance", date),
-            {
-                date: date,
-                records: attendance,
-                totalStudents: students.length,
-                savedAt: new Date().toISOString()
-            }
-        );
+    doc(db, "attendance", date),
+    {
+        date: date,
+        records: attendance,
+
+        studentNames: Object.fromEntries(
+            students.map(student => [
+                student.id,
+                student.name || "Unnamed Student"
+            ])
+        ),
+
+        totalStudents: students.length,
+        savedAt: new Date().toISOString()
+    }
+);
 
         alert("✅ Attendance saved successfully!");
 
