@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Student Profile | Bindass Karate Do Academy</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    color: #222;
+}
+
+.header {
+    background: #111;
+    color: white;
+    padding: 20px;
+}
+
+.header h1 {
+    font-size: 22px;
+}
+
+.header p {
+    color: #bbb;
+    margin-top: 5px;
+    font-size: 13px;
+}
+
+.container {
+    width: min(1100px, 94%);
+    margin: 25px auto;
+}
+
+.back-btn {
+    border: none;
+    background: #333;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-bottom: 18px;
+}
+
+.profile-header {
+    background: white;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+.profile-header h2 {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+.student-id {
+    color: #777;
+    font-size: 13px;
+}
+
+.status {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.section {
+    background: white;
+    border-radius: 14px;
+    padding: 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+}
+
+.section h3 {
+    font-size: 19px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.detail {
+    background: #f8fafc;
+    padding: 14px;
+    border-radius: 9px;
+}
+
+.detail strong {
+    display: block;
+    font-size: 12px;
+    color: #777;
+    margin-bottom: 5px;
+}
+
+.detail span {
+    font-weight: bold;
+}
+
+.attendance-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.attendance-card {
+    padding: 20px;
+    border-radius: 12px;
+    background: #f8fafc;
+    text-align: center;
+}
+
+.attendance-card strong {
+    display: block;
+    font-size: 28px;
+    margin-top: 6px;
+}
+
+.placeholder {
+    color: #777;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.fee-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    background: #f8fafc;
+    padding: 18px;
+    border-radius: 10px;
+}
+
+.pay-btn {
+    border: none;
+    background: #16a34a;
+    color: white;
+    padding: 11px 18px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.loading {
+    text-align: center;
+    padding: 50px;
+    color: #777;
+}
+
+@media (max-width: 650px) {
+
+    .container {
+        width: 94%;
+    }
+
+    .details-grid,
+    .attendance-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-header h2 {
+        font-size: 23px;
+    }
+
+    .fee-box {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .pay-btn {
+        width: 100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+    <h1>🥋 Bindass Karate Do Academy</h1>
+    <p>Student Profile</p>
+</header>
+
+<main class="container">
+
+    <button
+        class="back-btn"
+        onclick="window.location.href='students.html'"
+    >
+        ← Back to Students
+    </button>
+
+    <div id="profile">
+        <div class="loading">
+            Loading student profile...
+        </div>
+    </div>
+
+</main>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+import {
+    getAuth,
+    onAuthStateChanged
+}
+from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+let currentStudent = null;
+
+window.openPayment = function() {
+
+    if (!studentId) return;
+
+    const name =
+        document.querySelector(".profile-header h2")
+            ?.textContent
+            .trim() || "Student";
+
+    currentStudent = {
+        id: studentId,
+        name: name
+    };
+
+    document.getElementById("paymentStudentName")
+        .textContent = name;
+
+    document.getElementById("paymentModal")
+        .style.display = "flex";
+};
+
+
+window.closePayment = function() {
+
+    document.getElementById("paymentModal")
+        .style.display = "none";
+
+};
+
+
+window.payViaUPI = async function() {
+
+    const amount =
+        document.getElementById("paymentAmount").value;
+
+    if (!amount || Number(amount) <= 0) {
+        alert("Please enter a valid amount.");
+        return;
+    }
+
+    if (!currentStudent) {
+        alert("Student information not found.");
+        return;
+    }
+
+    const note =
+        `BKD Fees - ${currentStudent.name}`;
+
+    const upiURL =
+        `upi://pay?pa=bindasskarate786@okhdfcbank` +
+        `&pn=Bindass%20Karate%20Do%20Academy` +
+        `&am=${encodeURIComponent(amount)}` +
+        `&cu=INR` +
+        `&tn=${encodeURIComponent(note)}`;
+
+    try {
+
+        const paymentDoc = await addDoc(
+            collection(db, "payments"),
+            {
+                studentId: currentStudent.id,
+                studentName: currentStudent.name,
+                amount: Number(amount),
+                upiId: "bindasskarate786@okhdfcbank",
+                status: "Pending",
+                transactionRef: "",
+                paymentDate: null,
+                createdAt: serverTimestamp()
+            }
+        );
+
+        /*
+         * Remember the payment request
+         * even after leaving this page.
+         */
+
+        localStorage.setItem(
+            "bkd_pending_payment",
+            paymentDoc.id
+        );
+
+        /*
+         * Open the student's UPI app
+         */
+
+        window.location.href = upiURL;
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Unable to create payment request.");
+
+    }
+};
+async function checkPendingPayment() {
+
+    const pendingPaymentId =
+        localStorage.getItem("bkd_pending_payment");
+
+    if (!pendingPaymentId) {
+        return;
+    }
+
+    try {
+
+        const paymentSnap = await getDoc(
+            doc(db, "payments", pendingPaymentId)
+        );
+
+        if (!paymentSnap.exists()) {
+            localStorage.removeItem("bkd_pending_payment");
+            return;
+        }
+
+        const payment = paymentSnap.data();
+
+        /*
+         * Only show the UTR form if
+         * this payment is still waiting.
+         */
+
+        if (
+            payment.status === "Pending" &&
+            !payment.transactionRef
+        ) {
+
+            lastPaymentId = pendingPaymentId;
+
+            document.getElementById(
+                "paymentReferenceModal"
+            ).style.display = "flex";
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Unable to check pending payment:",
+            error
+        );
+
+    }
+}
+
+/* FIREBASE CONFIG */
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCDpKF59MATfa-JaGF9yOBvHyi8i__3CFc",
+  authDomain: "bindass-karate-do-academy.firebaseapp.com",
+  projectId: "bindass-karate-do-academy",
+  storageBucket: "bindass-karate-do-academy.firebasestorage.app",
+  messagingSenderId: "360953215088",
+  appId: "1:360953215088:web:c4399bcd991abf98229cb5",
+  measurementId: "G-FWLX780V9Q"
+};
+
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const profile = document.getElementById("profile");
+
+
+/* GET STUDENT ID FROM URL */
+
+const params = new URLSearchParams(window.location.search);
+const studentId = params.get("id");
+
+
+/* LOAD PROFILE */
+
+async function loadStudentProfile() {
+
+    if (!studentId) {
+
+        profile.innerHTML = `
+            <div class="section">
+                Student ID not found.
+            </div>
+        `;
+
+        return;
+    }
+
+    try {
+
+        const studentRef = doc(db, "students", studentId);
+        const studentSnap = await getDoc(studentRef);
+
+        if (!studentSnap.exists()) {
+
+            profile.innerHTML = `
+                <div class="section">
+                    Student not found.
+                </div>
+            `;
+
+            return;
+        }
+
+        const student = studentSnap.data();
+        const attendanceSnapshot = await getDocs(
+    collection(db, "attendance")
+);
+
+let totalDays = 0;
+let presentDays = 0;
+let monthlyTotal = 0;
+let monthlyPresent = 0;
+
+const currentMonth = new Date().toISOString().slice(0, 7);
+const currentYear = new Date().getFullYear().toString();
+
+attendanceSnapshot.forEach((attendanceDoc) => {
+
+    const date = attendanceDoc.id;
+    const data = attendanceDoc.data();
+    const status = data.records?.[studentId];
+
+    if (!status) return;
+
+    totalDays++;
+
+    if (status === "Present") {
+        presentDays++;
+    }
+
+    if (date.startsWith(currentMonth)) {
+
+        monthlyTotal++;
+
+        if (status === "Present") {
+            monthlyPresent++;
+        }
+    }
+});
+const monthlyData = {};
+
+attendanceSnapshot.forEach((attendanceDoc) => {
+
+    const date = attendanceDoc.id;
+    const data = attendanceDoc.data();
+    const status = data.records?.[studentId];
+
+    if (!status) return;
+
+    const month = date.slice(0, 7);
+
+    if (!monthlyData[month]) {
+        monthlyData[month] = {
+            total: 0,
+            present: 0
+        };
+    }
+
+    monthlyData[month].total++;
+
+    if (status === "Present") {
+        monthlyData[month].present++;
+    }
+});
+const overallPercentage =
+    totalDays > 0
+        ? Math.round((presentDays / totalDays) * 100)
+        : 0;
+
+const monthlyPercentage =
+    monthlyTotal > 0
+        ? Math.round((monthlyPresent / monthlyTotal) * 100)
+        : 0;
+const monthlyAttendanceHTML =
+    Object.keys(monthlyData)
+        .sort()
+        .map(month => {
+
+            const data = monthlyData[month];
+
+            const percentage =
+                Math.round((data.present / data.total) * 100);
+
+            const monthName =
+                new Date(month + "-01").toLocaleString(
+                    "en-US",
+                    { month: "long", year: "numeric" }
+                );
+
+            return `
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    padding:14px;
+                    margin-bottom:8px;
+                    background:#f8fafc;
+                    border-radius:9px;
+                ">
+                    <strong>${monthName}</strong>
+
+                    <span>
+                        ${data.present}/${data.total}
+                        &nbsp;•&nbsp;
+                        <strong>${percentage}%</strong>
+                    </span>
+                </div>
+            `;
+        })
+        .join("");
+        profile.innerHTML = `
+
+            <div class="profile-header">
+
+                <h2>
+                    ${escapeHTML(student.name || "Unnamed Student")}
+                </h2>
+
+                <div class="student-id">
+                    Student ID: ${escapeHTML(studentId)}
+                </div>
+
+                <span class="status">
+                    ${escapeHTML(student.status || "Active")}
+                </span>
+
+            </div>
+
+
+            <!-- ATTENDANCE -->
+
+            <div class="section">
+
+                <h3>📊 Attendance</h3>
+
+                <div class="attendance-grid">
+
+                    <div class="attendance-card">
+                        This Month
+                        <strong>${monthlyPercentage}%</strong>
+                    </div>
+
+                    <div class="attendance-card">
+                        This Year
+                        <strong>${overallPercentage}%</strong>
+                    </div>
+
+                    <div class="attendance-card">
+                        Overall
+                        <strong>${overallPercentage}%</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+<div style="margin-top:20px;">
+    <h4 style="margin-bottom:12px;">Monthly Attendance</h4>
+
+    <div id="monthlyAttendance">
+    ${monthlyAttendanceHTML || `
+        <div class="placeholder">
+            No attendance records available yet.
+        </div>
+    `}
+</div>
+</div>
+            <!-- DETAILS -->
+
+            <div class="section">
+
+                <h3>👤 Student Details</h3>
+
+                <div class="details-grid">
+
+                    <div class="detail">
+                        <strong>Date of Birth</strong>
+                        <span>${escapeHTML(student.dob || "-")}</span>
+                    </div>
+
+                    <div class="detail">
+                        <strong>Phone</strong>
+                        <span>${escapeHTML(student.phone || "-")}</span>
+                    </div>
+
+                    <div class="detail">
+                        <strong>Email</strong>
+                        <span>${escapeHTML(student.email || "-")}</span>
+                    </div>
+
+                    <div class="detail">
+                        <strong>Joining Date</strong>
+                        <span>${escapeHTML(student.joiningDate || "-")}</span>
+                    </div>
+
+                    <div class="detail">
+                        <strong>Belt</strong>
+                        <span>${escapeHTML(student.belt || "-")}</span>
+                    </div>
+
+                    <div class="detail">
+                        <strong>Status</strong>
+                        <span>${escapeHTML(student.status || "-")}</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ACHIEVEMENTS -->
+
+            <div class="section">
+
+                <h3>🏆 Achievements</h3>
+
+                <div class="placeholder">
+                    No achievements added yet.
+                </div>
+
+            </div>
+
+
+            <!-- NOTICES -->
+
+            <div class="section">
+
+                <h3>📢 Notices & New Updates</h3>
+
+                <div class="placeholder">
+                    No new notices or updates.
+                </div>
+
+            </div>
+
+
+            <!-- FEES -->
+
+<div class="section">
+
+    <h3>💳 Fees & Payment</h3>
+
+    <div class="details-grid">
+
+        <div class="detail">
+            <strong>Monthly Fee</strong>
+            <span id="monthlyFee">₹0</span>
+        </div>
+
+        <div class="detail">
+            <strong>Pending Fee</strong>
+            <span id="pendingFee">₹0</span>
+        </div>
+
+        <div class="detail">
+            <strong>Last Payment</strong>
+            <span id="lastPayment">-</span>
+        </div>
+
+        <div class="detail">
+            <strong>Payment Status</strong>
+            <span id="paymentStatus">Pending</span>
+        </div>
+
+    </div>
+
+    <div style="margin-top:18px;">
+
+        <button
+    class="pay-btn"
+    style="width:100%;"
+    onclick="openPayment()"
+>
+    💳 Pay Fees
+</button>
+
+    </div>
+
+</div>
+        `;
+
+    } catch (error) {
+
+        console.error(error);
+
+        profile.innerHTML = `
+            <div class="section">
+                Unable to load student profile.
+            </div>
+        `;
+
+    }
+
+}
+
+
+/* AUTH */
+
+onAuthStateChanged(auth, (user) => {
+
+    if (user) {
+        loadStudentProfile();
+    }
+
+});
+
+
+/* ESCAPE HTML */
+
+function escapeHTML(value) {
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
+import {
+    getFirestore,
+    doc,
+    getDoc,
+    collection,
+    getDocs,
+    addDoc,
+    updateDoc,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+;
+let lastPaymentId = null;
+window.openPaymentReference = function(paymentId) {
+
+    lastPaymentId = paymentId;
+
+    document.getElementById("transactionReference").value = "";
+
+    document.getElementById("paymentReferenceModal")
+        .style.display = "flex";
+};
+window.closePaymentReference = function() {
+
+    document.getElementById("paymentReferenceModal")
+        .style.display = "none";
+};
+window.submitPaymentReference = async function() {
+
+    const reference =
+        document.getElementById("transactionReference")
+            .value
+            .trim();
+
+    if (!reference) {
+
+        alert("Please enter the UTR / Transaction Reference.");
+
+        return;
+    }
+
+    if (!lastPaymentId) {
+
+        alert("Payment request not found.");
+
+        return;
+    }
+
+    try {
+
+        const paymentRef =
+            doc(db, "payments", lastPaymentId);
+
+        /*
+         * IMPORTANT:
+         * Payment remains Pending.
+         * Admin will verify it later.
+         */
+
+        await updateDoc(paymentRef, {
+
+            transactionRef: reference,
+
+            submittedAt: serverTimestamp(),
+
+            status: "Pending Verification"
+
+        });
+        localStorage.removeItem("bkd_pending_payment");
+
+        closePaymentReference();
+
+        alert(
+            "Payment details submitted successfully.\n\n" +
+            "Your payment is now pending verification by the academy."
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Unable to submit payment details."
+        );
+
+    }
+};
+</script>
+<!-- PAYMENT MODAL -->
+
+<div id="paymentModal" style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.7);
+    z-index:9999;
+    align-items:center;
+    justify-content:center;
+    padding:15px;
+">
+
+    <div style="
+        background:white;
+        width:100%;
+        max-width:450px;
+        border-radius:16px;
+        padding:25px;
+    ">
+
+        <h2>💳 Pay Academy Fees</h2>
+
+        <p style="margin-top:8px;color:#666;">
+            Student:
+            <strong id="paymentStudentName">-</strong>
+        </p>
+
+        <div style="
+            background:#f8fafc;
+            padding:15px;
+            border-radius:10px;
+            margin:18px 0;
+        ">
+
+            <strong>UPI ID</strong>
+
+            <p style="margin-top:6px;">
+                bindasskarate786@okhdfcbank
+            </p>
+
+        </div>
+
+        <label style="font-weight:bold;">
+            Amount
+        </label>
+
+        <input
+            id="paymentAmount"
+            type="number"
+            min="1"
+            placeholder="Enter amount"
+            style="
+                width:100%;
+                padding:12px;
+                margin-top:6px;
+                border:1px solid #ddd;
+                border-radius:8px;
+                font-size:16px;
+            "
+        >
+
+        <button
+            onclick="payViaUPI()"
+            style="
+                width:100%;
+                margin-top:15px;
+                padding:13px;
+                border:none;
+                border-radius:9px;
+                background:#16a34a;
+                color:white;
+                font-size:16px;
+                font-weight:bold;
+                cursor:pointer;
+            "
+        >
+            📱 Pay via UPI
+        </button>
+
+        <button
+            onclick="closePayment()"
+            style="
+                width:100%;
+                margin-top:10px;
+                padding:11px;
+                border:none;
+                border-radius:9px;
+                background:#eee;
+                font-weight:bold;
+                cursor:pointer;
+            "
+        >
+            Cancel
+        </button>
+
+    </div>
+
+</div>
+<!-- PAYMENT VERIFICATION MODAL -->
+
+<div id="paymentReferenceModal" style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.75);
+    z-index:10000;
+    align-items:center;
+    justify-content:center;
+    padding:15px;
+">
+
+    <div style="
+        background:white;
+        width:100%;
+        max-width:450px;
+        border-radius:18px;
+        padding:25px;
+    ">
+
+        <h2>Payment Confirmation</h2>
+
+        <p style="
+            margin-top:10px;
+            color:#555;
+            line-height:1.5;
+        ">
+            After completing the UPI payment, enter your
+            <strong>UPI Transaction Reference / UTR Number</strong>
+            below.
+        </p>
+
+        <label style="
+            display:block;
+            margin-top:20px;
+            font-weight:bold;
+        ">
+            Transaction Reference / UTR
+        </label>
+
+        <input
+            id="transactionReference"
+            type="text"
+            placeholder="Enter UTR / Transaction Reference"
+            style="
+                width:100%;
+                padding:13px;
+                margin-top:7px;
+                border:1px solid #ddd;
+                border-radius:9px;
+                font-size:16px;
+                box-sizing:border-box;
+            "
+        >
+
+        <button
+            onclick="submitPaymentReference()"
+            style="
+                width:100%;
+                margin-top:15px;
+                padding:13px;
+                border:none;
+                border-radius:9px;
+                background:#2563eb;
+                color:white;
+                font-size:16px;
+                font-weight:bold;
+                cursor:pointer;
+            "
+        >
+            Submit Payment Details
+        </button>
+
+        <button
+            onclick="closePaymentReference()"
+            style="
+                width:100%;
+                margin-top:10px;
+                padding:11px;
+                border:none;
+                border-radius:9px;
+                background:#eee;
+                font-weight:bold;
+            "
+        >
+            Cancel
+        </button>
+
+    </div>
+</div>
+
+</body>
+</html>
