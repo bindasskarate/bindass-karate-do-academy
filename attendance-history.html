@@ -191,6 +191,7 @@ Object.entries(records).forEach(async ([studentId, status], index) => {
 const studentName = studentSnap.exists()
     ? studentSnap.data().name
     : studentId;
+    
             const div = document.createElement("div");
             div.className = "student";
 
