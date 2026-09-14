@@ -205,12 +205,9 @@ body {
 
 <main class="container">
 
-    <button
-        class="back-btn"
-        onclick="window.location.href='students.html'"
-    >
-        ← Back to Students
-    </button>
+    <button id="backToStudentsBtn" class="back-btn" onclick="window.location.href='students.html'">
+    ← Back to Students
+</button>
 
     <div id="profile">
         <div class="loading">
@@ -740,6 +737,11 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     try {
+        const backBtn = document.getElementById("backToStudentsBtn");
+
+if (studentMode && backBtn) {
+    backBtn.style.display = "none";
+}
 
         // STUDENT LOGIN
         if (studentMode) {
