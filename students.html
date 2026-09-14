@@ -939,52 +939,47 @@ function renderStudents() {
 
             <div class="student-actions">
 
-                <button
-                    class="action-btn attendance-btn"
-                   onclick="window.location.href='attendance.html'"
-                >
-                    Attendance
-                </button>
+    <button
+        class="action-btn attendance-btn"
+        onclick="window.location.href='attendance.html'"
+    >
+        Attendance
+    </button>
 
-                <button
-    class="action-btn inactive-btn"
-    onclick="changeStatus('${student.id}', 'Inactive')"
->
-    Set Inactive
-</button>
+    <button
+        class="action-btn inactive-btn"
+        onclick="changeStatus('${student.id}', 'Inactive')"
+    >
+        Set Inactive
+    </button>
 
-<button
-    class="action-btn active-btn"
-    onclick="changeStatus('${student.id}', 'Active')"
->
-    Set Active
-</button>
-<button
-  class="action-btn edit-btn"
-  onclick="editStudent('${student.id}')"
->
-  Edit
-</button>
-<button
-  class="action-btn profile-btn"
-  onclick="window.location.href='student-profile.html?id=${student.id}'"
->
-  View Profile
-</button>
+    <button
+        class="action-btn active-btn"
+        onclick="changeStatus('${student.id}', 'Active')"
+    >
+        Set Active
+    </button>
 
-<button
-    class="action-btn profile-btn"
-    onclick="window.location.href='student-profile.html?id=${student.id}'"
->
-    View Profile
-</button>
+    <button
+        class="action-btn edit-btn"
+        onclick="editStudent('${student.id}')"
+    >
+        Edit
+    </button>
 
-<button
-    class="action-btn delete-btn"
-    onclick="deleteStudent('${student.id}', '${student.name.replace(/'/g, "\\'")}')"
->
-    Delete
-</button>
+    <button
+        class="action-btn profile-btn"
+        onclick="window.location.href='student-profile.html?id=${student.id}'"
+    >
+        View Profile
+    </button>
+
+    <button
+        class="action-btn delete-btn"
+        onclick="deleteStudent('${student.id}', '${student.name.replace(/'/g, "\\'")}')"
+    >
+        Delete
+    </button>
 
 </div>
 </div>
