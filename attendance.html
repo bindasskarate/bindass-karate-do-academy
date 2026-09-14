@@ -536,24 +536,30 @@ saveAttendance.addEventListener("click", async () => {
 
         const date = attendanceDate.value;
 
-        await setDoc(
+        const cleanRecords = Object.fromEntries(
+    students.map(student => [
+        student.id,
+        attendance[student.id] || "Present"
+    ])
+);
+
+const cleanStudentNames = Object.fromEntries(
+    students.map(student => [
+        student.id,
+        student.name || "Unnamed Student"
+    ])
+);
+
+await setDoc(
     doc(db, "attendance", date),
     {
         date: date,
-        records: attendance,
-
-        studentNames: Object.fromEntries(
-            students.map(student => [
-                student.id,
-                student.name || "Unnamed Student"
-            ])
-        ),
-
+        records: cleanRecords,
+        studentNames: cleanStudentNames,
         totalStudents: students.length,
         savedAt: new Date().toISOString()
     }
 );
-
         alert("✅ Attendance saved successfully!");
 
     }catch(error){
