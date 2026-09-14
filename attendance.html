@@ -550,12 +550,18 @@ const cleanStudentNames = Object.fromEntries(
     ])
 );
 
+const studentNames = {};
+
+students.forEach(student => {
+    studentNames[student.id] = student.name || "Unnamed Student";
+});
+
 await setDoc(
     doc(db, "attendance", date),
     {
         date: date,
-        records: cleanRecords,
-        studentNames: cleanStudentNames,
+        records: attendance,
+        studentNames: studentNames,
         totalStudents: students.length,
         savedAt: new Date().toISOString()
     }
