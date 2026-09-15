@@ -435,6 +435,57 @@ async function loadStudentProfile() {
         }
 
         const student = studentSnap.data();
+        // MONTHLY FEE CALCULATION
+
+const monthlyFee = Number(student.monthlyFee) || 0;
+
+let completedMonths = 0;
+
+if (student.joiningDate && monthlyFee > 0) {
+
+    const joiningDate = new Date(student.joiningDate + "T00:00:00");
+    const today = new Date();
+
+    completedMonths =
+        (today.getFullYear() - joiningDate.getFullYear()) * 12 +
+        (today.getMonth() - joiningDate.getMonth());
+
+    // If this month's joining-date day has not arrived yet,
+    // the current month is not completed.
+    if (today.getDate() < joiningDate.getDate()) {
+        completedMonths--;
+    }
+
+    if (completedMonths < 0) {
+        completedMonths = 0;
+    }
+}
+
+const totalMonthlyFees =
+    completedMonths * monthlyFee;
+    // GET VERIFIED PAYMENTS
+
+const paymentsSnapshot = await getDocs(
+    collection(db, "payments")
+);
+
+let totalPaid = 0;
+
+paymentsSnapshot.forEach((paymentDoc) => {
+
+    const payment = paymentDoc.data();
+
+    if (
+        payment.studentId === studentId &&
+        payment.status === "Paid"
+    ) {
+        totalPaid += Number(payment.amount) || 0;
+    }
+
+});
+
+const pendingFee =
+    Math.max(0, totalMonthlyFees - totalPaid);
         const attendanceSnapshot = await getDocs(
     collection(db, "attendance")
 );
@@ -684,7 +735,9 @@ const monthlyAttendanceHTML =
 
         <div class="detail">
             <strong>Pending Fee</strong>
-            <span id="pendingFee">₹0</span>
+            <span id="pendingFee">
+    ₹${pendingFee}
+</span>
         </div>
 
         <div class="detail">
@@ -694,7 +747,9 @@ const monthlyAttendanceHTML =
 
         <div class="detail">
             <strong>Payment Status</strong>
-            <span id="paymentStatus">Pending</span>
+            <span id="paymentStatus">
+    ${pendingFee > 0 ? "Pending" : "Paid"}
+</span>
         </div>
 
     </div>
