@@ -879,7 +879,11 @@ function renderFees(fees) {
                 </td>
 
                 <td>
-                    ${escapeHTML(fee.feeDate || "-")}
+                    ${escapeHTML(
+                        fee.paymentDate ||
+                        fee.feeDate ||
+                        "-"
+                    )}
                 </td>
 
                 <td>
@@ -894,7 +898,37 @@ function renderFees(fees) {
                                 ✓ Mark Paid
                             </button>
                         `
-                        : ""
+                        : `
+                            ${
+                                fee.receiptNumber
+                                ? `
+                                    <button
+                                        class="action-btn"
+                                        onclick="window.location.href='payment-receipt.html?id=${fee.id}&source=fees'"
+                                        style="
+                                            background:#2563eb;
+                                            color:white;
+                                            margin-bottom:5px;
+                                        "
+                                    >
+                                        🧾 View Receipt
+                                    </button>
+                                  `
+                                : `
+                                    <button
+                                        class="action-btn"
+                                        onclick="generateFeeReceipt('${fee.id}')"
+                                        style="
+                                            background:#2563eb;
+                                            color:white;
+                                            margin-bottom:5px;
+                                        "
+                                    >
+                                        🧾 Generate Receipt
+                                    </button>
+                                  `
+                            }
+                        `
                     }
 
                     <button
@@ -1248,6 +1282,86 @@ window.editFee = async function(feeId) {
 
 };
 
+/* GENERATE RECEIPT FOR OLD PAID FEE */
+
+window.generateFeeReceipt = async function(feeId) {
+
+    try {
+
+        const feeRef =
+            doc(db, "fees", feeId);
+
+        const feeSnap =
+            await getDoc(feeRef);
+
+
+        if (!feeSnap.exists()) {
+
+            alert("Fee record not found.");
+
+            return;
+        }
+
+
+        const fee =
+            feeSnap.data();
+
+
+        if (fee.status !== "Paid") {
+
+            alert(
+                "Receipt can only be generated for Paid fees."
+            );
+
+            return;
+        }
+
+
+        let receiptNumber =
+            fee.receiptNumber;
+
+
+        if (!receiptNumber) {
+
+            receiptNumber =
+                "BKD-" +
+                new Date().getFullYear() +
+                "-" +
+                Date.now();
+
+
+            await updateDoc(
+                feeRef,
+                {
+                    receiptNumber:
+                        receiptNumber,
+
+                    updatedAt:
+                        serverTimestamp()
+                }
+            );
+
+        }
+
+
+        window.location.href =
+            "payment-receipt.html?id=" +
+            feeId +
+            "&source=fees";
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Unable to generate receipt.\n\n" +
+            error.message
+        );
+
+    }
+
+};
 
 /* MARK FEE PAID */
 
@@ -1260,6 +1374,7 @@ window.markFeePaid = async function(feeId) {
 
     if (!confirmPaid) return;
 
+
     const paymentMethod = prompt(
         "Payment Method:\n\n" +
         "Enter: Cash / UPI / Bank Transfer / Online / Other",
@@ -1268,10 +1383,19 @@ window.markFeePaid = async function(feeId) {
 
     if (paymentMethod === null) return;
 
+
     const paymentReference = prompt(
         "Payment Reference / UTR (optional):",
         ""
     );
+
+
+    const receiptNumber =
+        "BKD-" +
+        new Date().getFullYear() +
+        "-" +
+        Date.now();
+
 
     try {
 
@@ -1279,169 +1403,6 @@ window.markFeePaid = async function(feeId) {
             doc(db, "fees", feeId),
             {
                 status: "Paid",
-                paymentMethod: paymentMethod || "Cash",
-                paymentReference: paymentReference || "",
-                paymentDate: new Date().toISOString().slice(0, 10),
-                updatedAt: serverTimestamp()
-            }
-        );
-
-        alert("Fee marked as Paid successfully!");
-
-        await loadStudentFees();
-        await updateSummary();
-
-    } catch (error) {
-
-        console.error(error);
-        alert("Unable to update payment. Please try again.");
-
-    }
-
-};
-window.markMonthlyFeePaid = async function() {
-
-    if (!selectedStudent) {
-        alert("Please select a student first.");
-        return;
-    }
-
-    const monthlyFee = Number(selectedStudent.monthlyFee) || 0;
-
-    if (monthlyFee <= 0) {
-        alert("No monthly fee is set for this student.");
-        return;
-    }
-
-    // Select the month for which the fee is being paid
-    const now = new Date();
-
-    const monthInput = prompt(
-        "Enter the Fee Month.\n\n" +
-        "Format: YYYY-MM\n\n" +
-        "Example:\n" +
-        "2026-08 = August 2026\n" +
-        "2026-09 = September 2026",
-        now.toISOString().slice(0, 7)
-    );
-
-    if (!monthInput) return;
-
-    if (!/^\d{4}-\d{2}$/.test(monthInput)) {
-        alert("Invalid month format.\nPlease use YYYY-MM.");
-        return;
-    }
-
-    const [year, month] = monthInput.split("-");
-
-    const monthNumber = Number(month);
-
-    if (monthNumber < 1 || monthNumber > 12) {
-        alert("Invalid month.");
-        return;
-    }
-
-    const feeMonthDate = new Date(
-        Number(year),
-        monthNumber - 1,
-        1
-    );
-
-    const feeMonthName = feeMonthDate.toLocaleString(
-        "en-IN",
-        {
-            month: "long",
-            year: "numeric"
-        }
-    );
-
-    // Actual date on which payment was received
-    const paymentDateInput = prompt(
-        "Enter Payment Date.\n\n" +
-        "Format: YYYY-MM-DD",
-        now.toISOString().slice(0, 10)
-    );
-
-    if (!paymentDateInput) return;
-
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(paymentDateInput)) {
-        alert("Invalid payment date.\nPlease use YYYY-MM-DD.");
-        return;
-    }
-
-    const paymentMethod = prompt(
-        "Payment Method:\n\n" +
-        "Cash / UPI / Bank Transfer / Online / Other",
-        "Cash"
-    );
-
-    if (paymentMethod === null) return;
-
-    const paymentReference = prompt(
-        "Payment Reference / UTR (optional):",
-        ""
-    );
-
-    // Prevent accidentally recording the same month's payment twice
-    const existingPayments = await getDocs(
-        collection(db, "payments")
-    );
-
-    let alreadyPaid = false;
-
-    existingPayments.forEach((paymentDoc) => {
-
-        const payment = paymentDoc.data();
-
-        if (
-            payment.studentId === selectedStudent.id &&
-            payment.type === "Monthly Fee" &&
-            payment.feeMonth === monthInput &&
-            payment.status === "Paid"
-        ) {
-            alreadyPaid = true;
-        }
-
-    });
-
-    if (alreadyPaid) {
-        alert(
-            "Monthly fee for " +
-            feeMonthName +
-            " is already marked as Paid."
-        );
-        return;
-    }
-
-    const confirmPaid = confirm(
-        "Confirm Monthly Fee Payment?\n\n" +
-        "Student: " + (selectedStudent.name || "") + "\n" +
-        "Fee Month: " + feeMonthName + "\n" +
-        "Amount: ₹" + monthlyFee + "\n" +
-        "Payment Date: " + paymentDateInput + "\n" +
-        "Method: " + (paymentMethod || "Cash")
-    );
-
-    if (!confirmPaid) return;
-
-    try {
-
-        await addDoc(
-            collection(db, "payments"),
-            {
-                studentId: selectedStudent.id,
-                studentName: selectedStudent.name || "",
-
-                amount: monthlyFee,
-
-                type: "Monthly Fee",
-
-description: "Monthly Fee - " + feeMonthName,
-
-feeMonth: monthInput,
-feeMonthName: feeMonthName,
-
-paymentDate: paymentDateInput,
 
                 paymentMethod:
                     paymentMethod || "Cash",
@@ -1449,33 +1410,42 @@ paymentDate: paymentDateInput,
                 paymentReference:
                     paymentReference || "",
 
-                status: "Paid",
+                paymentDate:
+                    new Date()
+                        .toISOString()
+                        .slice(0, 10),
 
-                createdAt: serverTimestamp()
+                receiptNumber:
+                    receiptNumber,
+
+                updatedAt:
+                    serverTimestamp()
             }
         );
 
+
         alert(
-            "Monthly Fee Paid Successfully!\n\n" +
-            "Month: " + feeMonthName + "\n" +
-            "Amount: ₹" + monthlyFee
+            "Fee marked as Paid successfully!\n\n" +
+            "Receipt No: " +
+            receiptNumber
         );
+
+
+        await loadStudentFees();
 
         await updateSummary();
 
-        if (typeof loadStudentFees === "function") {
-            await loadStudentFees();
-        }
 
     } catch (error) {
 
         console.error(error);
 
         alert(
-            "Unable to record monthly fee payment.\n" +
-            "Please try again."
+            "Unable to update payment. Please try again."
         );
+
     }
+
 };
 
 /* ESCAPE HTML */
