@@ -1436,10 +1436,12 @@ window.markMonthlyFeePaid = async function() {
 
                 type: "Monthly Fee",
 
-                feeMonth: monthInput,
-                feeMonthName: feeMonthName,
+description: "Monthly Fee - " + feeMonthName,
 
-                paymentDate: paymentDateInput,
+feeMonth: monthInput,
+feeMonthName: feeMonthName,
+
+paymentDate: paymentDateInput,
 
                 paymentMethod:
                     paymentMethod || "Cash",
