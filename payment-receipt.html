@@ -273,13 +273,13 @@ import {
 
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCDpKF59MATfa-JaGF9yOBvHyi8i__3CFc",
-  authDomain: "bindass-karate-do-academy.firebaseapp.com",
-  projectId: "bindass-karate-do-academy",
-  storageBucket: "bindass-karate-do-academy.firebasestorage.app",
-  messagingSenderId: "360953215088",
-  appId: "1:360953215088:web:c4399bcd991abf98229cb5",
-  measurementId: "G-FWLX780V9Q"
+    apiKey: "AIzaSyCDpKF59MATfa-JaGF9yOBvHyi8i__3CFc",
+    authDomain: "bindass-karate-do-academy.firebaseapp.com",
+    projectId: "bindass-karate-do-academy",
+    storageBucket: "bindass-karate-do-academy.firebasestorage.app",
+    messagingSenderId: "360953215088",
+    appId: "1:360953215088:web:c4399bcd991abf98229cb5",
+    measurementId: "G-FWLX780V9Q"
 };
 
 
@@ -288,20 +288,25 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 
+// GET ID AND SOURCE FROM URL
+
 const params =
     new URLSearchParams(window.location.search);
 
-const paymentId =
+const recordId =
     params.get("id");
 
 const source =
     params.get("source") || "payments";
 
+
+// LOAD RECEIPT
+
 async function loadReceipt() {
 
-    if (!paymentId) {
+    if (!recordId) {
 
-        alert("Payment receipt not found.");
+        alert("Receipt record not found.");
 
         return;
     }
@@ -311,72 +316,124 @@ async function loadReceipt() {
 
         let receiptData = null;
 
-if (source === "fees") {
 
-    const feeSnap =
-        await getDoc(
-            doc(db, "fees", paymentId)
-        );
+        // ==============================
+        // LOAD FROM FEES
+        // ==============================
 
-    if (!feeSnap.exists()) {
+        if (source === "fees") {
 
-        alert("Fee record not found.");
+            const feeSnap =
+                await getDoc(
+                    doc(db, "fees", recordId)
+                );
 
-        return;
-    }
 
-    receiptData = feeSnap.data();
+            if (!feeSnap.exists()) {
 
-} else {
+                alert("Fee record not found.");
 
-    const paymentSnap =
-        await getDoc(
-            doc(db, "payments", paymentId)
-        );
+                return;
+            }
 
-    if (!paymentSnap.exists()) {
 
-        alert("Payment record not found.");
+            receiptData =
+                feeSnap.data();
 
-        return;
-    }
+        }
 
-    receiptData = paymentSnap.data();
-}
 
-        document.getElementById("receiptNumber").textContent =
+        // ==============================
+        // LOAD FROM PAYMENTS
+        // ==============================
+
+        else {
+
+            const paymentSnap =
+                await getDoc(
+                    doc(db, "payments", recordId)
+                );
+
+
+            if (!paymentSnap.exists()) {
+
+                alert("Payment record not found.");
+
+                return;
+            }
+
+
+            receiptData =
+                paymentSnap.data();
+
+        }
+
+
+        // ==============================
+        // DISPLAY RECEIPT
+        // ==============================
+
+        document.getElementById("receiptNumber")
+            .textContent =
             receiptData.receiptNumber || "-";
 
 
-        document.getElementById("paymentDate").textContent =
-    receiptData.paymentDate || "-";
+        document.getElementById("paymentDate")
+            .textContent =
+            receiptData.paymentDate ||
+            receiptData.feeDate ||
+            "-";
 
-document.getElementById("studentName").textContent =
-    receiptData.studentName || "-";
 
-document.getElementById("feeType").textContent =
-    receiptData.type || "Fee";
+        document.getElementById("studentName")
+            .textContent =
+            receiptData.studentName || "-";
 
-document.getElementById("feeMonth").textContent =
-    receiptData.feeMonthName ||
-    receiptData.description ||
-    "-";
 
-document.getElementById("paymentMethod").textContent =
-    receiptData.paymentMethod || "-";
+        document.getElementById("feeType")
+            .textContent =
+            receiptData.type || "Fee";
 
-document.getElementById("paymentReference").textContent =
-    receiptData.paymentReference ||
-    receiptData.transactionRef ||
-    "-";
 
-document.getElementById("amount").textContent =
-    "₹" + (Number(receiptData.amount) || 0);
-    } catch (error) {
+        document.getElementById("feeMonth")
+            .textContent =
+            receiptData.feeMonthName ||
+            receiptData.feeMonth ||
+            receiptData.description ||
+            "-";
 
-        console.error(error);
 
-        alert("Unable to load receipt.");
+        document.getElementById("paymentMethod")
+            .textContent =
+            receiptData.paymentMethod || "-";
+
+
+        document.getElementById("paymentReference")
+            .textContent =
+            receiptData.paymentReference ||
+            receiptData.transactionRef ||
+            "-";
+
+
+        document.getElementById("amount")
+            .textContent =
+            "₹" +
+            (Number(receiptData.amount) || 0);
+
+    }
+
+
+    catch (error) {
+
+        console.error(
+            "Receipt loading error:",
+            error
+        );
+
+        alert(
+            "Unable to load receipt.\n\n" +
+            error.message
+        );
 
     }
 
@@ -386,6 +443,5 @@ document.getElementById("amount").textContent =
 loadReceipt();
 
 </script>
-
 </body>
 </html>
