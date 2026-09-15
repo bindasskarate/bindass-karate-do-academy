@@ -1313,20 +1313,65 @@ window.markMonthlyFeePaid = async function() {
         return;
     }
 
-    const paymentDate = new Date().toISOString().slice(0, 10);
+    // Select the month for which the fee is being paid
+    const now = new Date();
 
-    const confirmPaid = confirm(
-        "Mark Monthly Fee as Paid?\n\n" +
-        "Student: " + (selectedStudent.name || "") + "\n" +
-        "Amount: ₹" + monthlyFee + "\n" +
-        "Date: " + paymentDate
+    const monthInput = prompt(
+        "Enter the Fee Month.\n\n" +
+        "Format: YYYY-MM\n\n" +
+        "Example:\n" +
+        "2026-08 = August 2026\n" +
+        "2026-09 = September 2026",
+        now.toISOString().slice(0, 7)
     );
 
-    if (!confirmPaid) return;
+    if (!monthInput) return;
+
+    if (!/^\d{4}-\d{2}$/.test(monthInput)) {
+        alert("Invalid month format.\nPlease use YYYY-MM.");
+        return;
+    }
+
+    const [year, month] = monthInput.split("-");
+
+    const monthNumber = Number(month);
+
+    if (monthNumber < 1 || monthNumber > 12) {
+        alert("Invalid month.");
+        return;
+    }
+
+    const feeMonthDate = new Date(
+        Number(year),
+        monthNumber - 1,
+        1
+    );
+
+    const feeMonthName = feeMonthDate.toLocaleString(
+        "en-IN",
+        {
+            month: "long",
+            year: "numeric"
+        }
+    );
+
+    // Actual date on which payment was received
+    const paymentDateInput = prompt(
+        "Enter Payment Date.\n\n" +
+        "Format: YYYY-MM-DD",
+        now.toISOString().slice(0, 10)
+    );
+
+    if (!paymentDateInput) return;
+
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(paymentDateInput)) {
+        alert("Invalid payment date.\nPlease use YYYY-MM-DD.");
+        return;
+    }
 
     const paymentMethod = prompt(
         "Payment Method:\n\n" +
-        "Enter: Cash / UPI / Bank Transfer / Online / Other",
+        "Cash / UPI / Bank Transfer / Online / Other",
         "Cash"
     );
 
@@ -1337,6 +1382,48 @@ window.markMonthlyFeePaid = async function() {
         ""
     );
 
+    // Prevent accidentally recording the same month's payment twice
+    const existingPayments = await getDocs(
+        collection(db, "payments")
+    );
+
+    let alreadyPaid = false;
+
+    existingPayments.forEach((paymentDoc) => {
+
+        const payment = paymentDoc.data();
+
+        if (
+            payment.studentId === selectedStudent.id &&
+            payment.type === "Monthly Fee" &&
+            payment.feeMonth === monthInput &&
+            payment.status === "Paid"
+        ) {
+            alreadyPaid = true;
+        }
+
+    });
+
+    if (alreadyPaid) {
+        alert(
+            "Monthly fee for " +
+            feeMonthName +
+            " is already marked as Paid."
+        );
+        return;
+    }
+
+    const confirmPaid = confirm(
+        "Confirm Monthly Fee Payment?\n\n" +
+        "Student: " + (selectedStudent.name || "") + "\n" +
+        "Fee Month: " + feeMonthName + "\n" +
+        "Amount: ₹" + monthlyFee + "\n" +
+        "Payment Date: " + paymentDateInput + "\n" +
+        "Method: " + (paymentMethod || "Cash")
+    );
+
+    if (!confirmPaid) return;
+
     try {
 
         await addDoc(
@@ -1344,23 +1431,39 @@ window.markMonthlyFeePaid = async function() {
             {
                 studentId: selectedStudent.id,
                 studentName: selectedStudent.name || "",
+
                 amount: monthlyFee,
+
                 type: "Monthly Fee",
-                paymentDate: paymentDate,
-                paymentMethod: paymentMethod || "Cash",
-                paymentReference: paymentReference || "",
+
+                feeMonth: monthInput,
+                feeMonthName: feeMonthName,
+
+                paymentDate: paymentDateInput,
+
+                paymentMethod:
+                    paymentMethod || "Cash",
+
+                paymentReference:
+                    paymentReference || "",
+
                 status: "Paid",
+
                 createdAt: serverTimestamp()
             }
         );
 
         alert(
             "Monthly Fee Paid Successfully!\n\n" +
-            "Student: " + selectedStudent.name + "\n" +
+            "Month: " + feeMonthName + "\n" +
             "Amount: ₹" + monthlyFee
         );
 
         await updateSummary();
+
+        if (typeof loadStudentFees === "function") {
+            await loadStudentFees();
+        }
 
     } catch (error) {
 
@@ -1372,7 +1475,6 @@ window.markMonthlyFeePaid = async function() {
         );
     }
 };
-
 
 /* ESCAPE HTML */
 
