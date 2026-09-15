@@ -470,6 +470,16 @@ body {
             </div>
 
             <div class="form-group">
+    <label>Monthly Fee (₹)</label>
+    <input
+        type="number"
+        id="monthlyFee"
+        min="0"
+        placeholder="Enter monthly fee"
+    >
+</div>
+
+            <div class="form-group">
                 <label>Belt *</label>
 
                 <select id="studentBelt" required>
@@ -689,6 +699,10 @@ studentForm.addEventListener("submit", async (event) => {
             joiningDate: document
                 .getElementById("joiningDate")
                 .value,
+
+                monthlyFee: Number(
+    document.getElementById("monthlyFee").value
+) || 0,
 
             belt: document
                 .getElementById("studentBelt")
@@ -1021,6 +1035,8 @@ window.editStudent = async function(id) {
         document.getElementById("studentPhone").value = student.phone || "";
         document.getElementById("studentBelt").value = student.belt || "";
         document.getElementById("joiningDate").value = student.joiningDate || "";
+        document.getElementById("monthlyFee").value =
+    student.monthlyFee ?? "";
         document.getElementById("studentStatus").value = student.status || "Active";
 
         studentModal.style.display = "flex";
