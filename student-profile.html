@@ -465,11 +465,17 @@ const totalMonthlyFees =
     completedMonths * monthlyFee;
     // GET VERIFIED PAYMENTS
 
+// ==========================================
+// FEES + PAYMENT CALCULATION
+// ==========================================
+
+// 1. VERIFIED ONLINE / UPI PAYMENTS
+
 const paymentsSnapshot = await getDocs(
     collection(db, "payments")
 );
 
-let totalPaid = 0;
+let verifiedPaymentsTotal = 0;
 
 paymentsSnapshot.forEach((paymentDoc) => {
 
@@ -479,13 +485,81 @@ paymentsSnapshot.forEach((paymentDoc) => {
         payment.studentId === studentId &&
         payment.status === "Paid"
     ) {
-        totalPaid += Number(payment.amount) || 0;
+        verifiedPaymentsTotal +=
+            Number(payment.amount) || 0;
     }
 
 });
 
+
+// ==========================================
+// 2. FEE MANAGEMENT RECORDS
+// ==========================================
+
+const feesSnapshot = await getDocs(
+    collection(db, "fees")
+);
+
+let pendingOtherFees = 0;
+let paidOtherFees = 0;
+
+const studentFeeRecords = [];
+
+feesSnapshot.forEach((feeDoc) => {
+
+    const fee = feeDoc.data();
+
+    if (fee.studentId !== studentId) {
+        return;
+    }
+
+    const amount = Number(fee.amount) || 0;
+
+    studentFeeRecords.push({
+        id: feeDoc.id,
+        ...fee,
+        amount: amount
+    });
+
+    if (fee.status === "Paid") {
+
+        paidOtherFees += amount;
+
+    } else {
+
+        pendingOtherFees += amount;
+
+    }
+
+});
+
+
+// ==========================================
+// 3. FINAL PENDING FEE
+// ==========================================
+
+// Monthly dues are calculated automatically
+// from joining date + monthly fee.
+
+const pendingMonthlyFee =
+    Math.max(
+        0,
+        totalMonthlyFees - verifiedPaymentsTotal
+    );
+
+// Add pending Tournament / Equipment / Exam etc.
+
 const pendingFee =
-    Math.max(0, totalMonthlyFees - totalPaid);
+    pendingMonthlyFee + pendingOtherFees;
+
+
+// ==========================================
+// 4. TOTAL PAID
+// ==========================================
+
+const totalPaid =
+    verifiedPaymentsTotal + paidOtherFees;
+
         const attendanceSnapshot = await getDocs(
     collection(db, "attendance")
 );
@@ -729,40 +803,190 @@ const monthlyAttendanceHTML =
         <div class="detail">
             <strong>Monthly Fee</strong>
             <span id="monthlyFee">
-    ₹${student.monthlyFee || 0}
-</span>
+                ₹${monthlyFee}
+            </span>
+        </div>
+
+        <div class="detail">
+            <strong>Monthly Dues</strong>
+            <span>
+                ₹${totalMonthlyFees}
+            </span>
+        </div>
+
+        <div class="detail">
+            <strong>Other Pending Fees</strong>
+            <span>
+                ₹${pendingOtherFees}
+            </span>
+        </div>
+
+        <div class="detail">
+            <strong>Total Paid</strong>
+            <span>
+                ₹${totalPaid}
+            </span>
         </div>
 
         <div class="detail">
             <strong>Pending Fee</strong>
             <span id="pendingFee">
-    ₹${pendingFee}
-</span>
-        </div>
-
-        <div class="detail">
-            <strong>Last Payment</strong>
-            <span id="lastPayment">-</span>
+                ₹${pendingFee}
+            </span>
         </div>
 
         <div class="detail">
             <strong>Payment Status</strong>
             <span id="paymentStatus">
-    ${pendingFee > 0 ? "Pending" : "Paid"}
-</span>
+                ${pendingFee > 0 ? "Pending" : "Paid"}
+            </span>
         </div>
 
     </div>
 
+
+    <!-- FEE HISTORY -->
+
+    <div style="margin-top:25px;">
+
+        <h4 style="margin-bottom:12px;">
+            📋 Fee History
+        </h4>
+
+        ${
+            studentFeeRecords.length === 0
+                ? `
+                    <div class="detail">
+                        No additional fee records found.
+                    </div>
+                  `
+                : `
+                    <div style="overflow-x:auto;">
+
+                        <table style="
+                            width:100%;
+                            border-collapse:collapse;
+                            min-width:600px;
+                        ">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th style="
+                                        text-align:left;
+                                        padding:10px;
+                                    ">
+                                        Date
+                                    </th>
+
+                                    <th style="
+                                        text-align:left;
+                                        padding:10px;
+                                    ">
+                                        Type
+                                    </th>
+
+                                    <th style="
+                                        text-align:left;
+                                        padding:10px;
+                                    ">
+                                        Description
+                                    </th>
+
+                                    <th style="
+                                        text-align:left;
+                                        padding:10px;
+                                    ">
+                                        Amount
+                                    </th>
+
+                                    <th style="
+                                        text-align:left;
+                                        padding:10px;
+                                    ">
+                                        Status
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                ${
+                                    studentFeeRecords
+                                    .sort((a, b) =>
+                                        String(b.feeDate || "")
+                                        .localeCompare(
+                                            String(a.feeDate || "")
+                                        )
+                                    )
+                                    .map(fee => `
+                                        <tr>
+
+                                            <td style="
+                                                padding:10px;
+                                            ">
+                                                ${fee.feeDate || "-"}
+                                            </td>
+
+                                            <td style="
+                                                padding:10px;
+                                            ">
+                                                ${fee.type || "-"}
+                                            </td>
+
+                                            <td style="
+                                                padding:10px;
+                                            ">
+                                                ${fee.description || "-"}
+                                            </td>
+
+                                            <td style="
+                                                padding:10px;
+                                            ">
+                                                ₹${fee.amount}
+                                            </td>
+
+                                            <td style="
+                                                padding:10px;
+                                                font-weight:600;
+                                            ">
+                                                ${
+                                                    fee.status === "Paid"
+                                                        ? "Paid"
+                                                        : "Pending"
+                                                }
+                                            </td>
+
+                                        </tr>
+                                    `)
+                                    .join("")
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+                  `
+        }
+
+    </div>
+
+
+    <!-- PAY BUTTON -->
+
     <div style="margin-top:18px;">
 
         <button
-    class="pay-btn"
-    style="width:100%;"
-    onclick="openPayment()"
->
-    💳 Pay Fees
-</button>
+            class="pay-btn"
+            style="width:100%;"
+            onclick="openPayment()"
+        >
+            💳 Pay Fees
+        </button>
 
     </div>
 
