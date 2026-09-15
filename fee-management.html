@@ -404,6 +404,14 @@ body {
     >
         + Add Fee
     </button>
+    
+    <button
+    class="primary-btn"
+    onclick="markMonthlyFeePaid()"
+    style="margin-left:10px;"
+>
+    ✓ Mark Monthly Fee Paid
+</button>
 
     <div style="margin-top:20px;overflow-x:auto;">
 
@@ -1290,6 +1298,79 @@ window.markFeePaid = async function(feeId) {
 
     }
 
+};
+window.markMonthlyFeePaid = async function() {
+
+    if (!selectedStudent) {
+        alert("Please select a student first.");
+        return;
+    }
+
+    const monthlyFee = Number(selectedStudent.monthlyFee) || 0;
+
+    if (monthlyFee <= 0) {
+        alert("No monthly fee is set for this student.");
+        return;
+    }
+
+    const paymentDate = new Date().toISOString().slice(0, 10);
+
+    const confirmPaid = confirm(
+        "Mark Monthly Fee as Paid?\n\n" +
+        "Student: " + (selectedStudent.name || "") + "\n" +
+        "Amount: ₹" + monthlyFee + "\n" +
+        "Date: " + paymentDate
+    );
+
+    if (!confirmPaid) return;
+
+    const paymentMethod = prompt(
+        "Payment Method:\n\n" +
+        "Enter: Cash / UPI / Bank Transfer / Online / Other",
+        "Cash"
+    );
+
+    if (paymentMethod === null) return;
+
+    const paymentReference = prompt(
+        "Payment Reference / UTR (optional):",
+        ""
+    );
+
+    try {
+
+        await addDoc(
+            collection(db, "payments"),
+            {
+                studentId: selectedStudent.id,
+                studentName: selectedStudent.name || "",
+                amount: monthlyFee,
+                type: "Monthly Fee",
+                paymentDate: paymentDate,
+                paymentMethod: paymentMethod || "Cash",
+                paymentReference: paymentReference || "",
+                status: "Paid",
+                createdAt: serverTimestamp()
+            }
+        );
+
+        alert(
+            "Monthly Fee Paid Successfully!\n\n" +
+            "Student: " + selectedStudent.name + "\n" +
+            "Amount: ₹" + monthlyFee
+        );
+
+        await updateSummary();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Unable to record monthly fee payment.\n" +
+            "Please try again."
+        );
+    }
 };
 
 
