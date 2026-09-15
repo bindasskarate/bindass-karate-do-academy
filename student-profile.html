@@ -984,15 +984,45 @@ const monthlyAttendanceHTML =
                                             </td>
 
                                             <td style="
-                                                padding:10px;
-                                                font-weight:600;
-                                            ">
-                                                ${
-                                                    fee.status === "Paid"
-                                                        ? "Paid"
-                                                        : "Pending"
-                                                }
-                                            </td>
+    padding:10px;
+    font-weight:600;
+">
+    ${
+        fee.status === "Paid"
+            ? `
+                <div>
+                    <span>Paid</span>
+
+                    ${
+                        fee.id && fee.receiptNumber
+                            ? `
+                                <br>
+
+                                <button
+                                    onclick="window.location.href='payment-receipt.html?id=${fee.id}'"
+                                    style="
+                                        margin-top:6px;
+                                        padding:6px 10px;
+                                        border:none;
+                                        border-radius:6px;
+                                        background:#2563eb;
+                                        color:white;
+                                        font-size:12px;
+                                        font-weight:600;
+                                        cursor:pointer;
+                                    "
+                                >
+                                    🧾 View Receipt
+                                </button>
+                              `
+                            : ""
+                    }
+
+                </div>
+              `
+            : "Pending"
+    }
+</td>
 
                                         </tr>
                                     `)
