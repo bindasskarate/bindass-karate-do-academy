@@ -27,7 +27,7 @@
             border-radius: 12px;
             box-shadow: 0 5px 25px rgba(0,0,0,0.12);
         }
-        
+
 .receipt-logo {
     width: 90px;
     height: 90px;
@@ -279,6 +279,11 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 
 import {
+    getAuth,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+import {
     getFirestore,
     doc,
     getDoc
@@ -300,6 +305,7 @@ const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
 
+const auth = getAuth(app);
 
 // GET ID AND SOURCE FROM URL
 
@@ -453,7 +459,19 @@ async function loadReceipt() {
 }
 
 
-loadReceipt();
+onAuthStateChanged(auth, (user) => {
+
+    if (user) {
+
+        loadReceipt();
+
+    } else {
+
+        alert("Please login first.");
+
+    }
+
+});
 
 </script>
 </body>
