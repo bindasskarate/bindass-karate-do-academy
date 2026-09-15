@@ -1245,42 +1245,48 @@ window.editFee = async function(feeId) {
 
 window.markFeePaid = async function(feeId) {
 
-    const confirmPaid =
-        confirm(
-            "Mark this fee as Paid?"
-        );
-
+    const confirmPaid = confirm(
+        "Mark this fee as Paid?\n\n" +
+        "This will update the student's fee record."
+    );
 
     if (!confirmPaid) return;
 
+    const paymentMethod = prompt(
+        "Payment Method:\n\n" +
+        "Enter: Cash / UPI / Bank Transfer / Online / Other",
+        "Cash"
+    );
+
+    if (paymentMethod === null) return;
+
+    const paymentReference = prompt(
+        "Payment Reference / UTR (optional):",
+        ""
+    );
 
     try {
 
         await updateDoc(
             doc(db, "fees", feeId),
             {
-
                 status: "Paid",
-
-                paymentDate:
-                    new Date().toISOString().slice(0, 10),
-
-                updatedAt:
-                    serverTimestamp()
-
+                paymentMethod: paymentMethod || "Cash",
+                paymentReference: paymentReference || "",
+                paymentDate: new Date().toISOString().slice(0, 10),
+                updatedAt: serverTimestamp()
             }
         );
 
-
-        alert("Fee marked as Paid.");
+        alert("Fee marked as Paid successfully!");
 
         await loadStudentFees();
+        await updateSummary();
 
     } catch (error) {
 
         console.error(error);
-
-        alert("Unable to update fee.");
+        alert("Unable to update payment. Please try again.");
 
     }
 
