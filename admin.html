@@ -433,23 +433,70 @@
     </main>
 
 
-    <script>
+    <script type="module">
 
-        function showMessage(section) {
+    import { initializeApp }
+        from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 
-            document.getElementById("activity").textContent =
-                section + " section selected.";
+    import {
+        getFirestore,
+        collection,
+        onSnapshot
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
-        }
+
+    const firebaseConfig = {
+        // KEEP YOUR EXISTING FIREBASE CONFIG HERE
+    };
 
 
-        function logout() {
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-            window.location.href = "login.html";
 
-        }
+    // LOAD STUDENT STATISTICS
 
-    </script>
+    onSnapshot(collection(db, "students"), (snapshot) => {
+
+        let total = 0;
+        let active = 0;
+
+        snapshot.forEach((studentDoc) => {
+
+            total++;
+
+            const student = studentDoc.data();
+
+            if (student.status === "Active") {
+                active++;
+            }
+
+        });
+
+        document.getElementById("totalStudents").textContent = total;
+        document.getElementById("activeStudents").textContent = active;
+
+    });
+
+
+    function showMessage(section) {
+
+        document.getElementById("activity").textContent =
+            section + " section selected.";
+
+    }
+
+
+    function logout() {
+
+        window.location.href = "login.html";
+
+    }
+
+    window.showMessage = showMessage;
+    window.logout = logout;
+
+</script>
 
 </body>
 </html>
