@@ -532,7 +532,41 @@ feesSnapshot.forEach((feeDoc) => {
     }
 
 });
+// ==========================================
+// ADD VERIFIED PAYMENTS TO FEE HISTORY
+// ==========================================
 
+paymentsSnapshot.forEach((paymentDoc) => {
+
+    const payment = paymentDoc.data();
+
+    if (
+        payment.studentId !== studentId ||
+        payment.status !== "Paid"
+    ) {
+        return;
+    }
+
+    studentFeeRecords.push({
+        id: paymentDoc.id,
+        type: payment.type || "Monthly Fee",
+        description:
+            payment.description ||
+            "Monthly Fee Payment",
+        amount: Number(payment.amount) || 0,
+        status: "Paid",
+        feeDate:
+            payment.paymentDate ||
+            "",
+        paymentMethod:
+            payment.paymentMethod ||
+            "",
+        paymentReference:
+            payment.paymentReference ||
+            ""
+    });
+
+});
 
 // ==========================================
 // 3. FINAL PENDING FEE
