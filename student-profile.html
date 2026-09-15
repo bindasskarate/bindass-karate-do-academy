@@ -516,11 +516,11 @@ feesSnapshot.forEach((feeDoc) => {
     const amount = Number(fee.amount) || 0;
 
     studentFeeRecords.push({
-        id: feeDoc.id,
-        ...fee,
-        amount: amount
-    });
-
+    id: feeDoc.id,
+    source: "fees",
+    ...fee,
+    amount: amount
+});
     if (fee.status === "Paid") {
 
         paidOtherFees += amount;
@@ -548,23 +548,34 @@ paymentsSnapshot.forEach((paymentDoc) => {
     }
 
     studentFeeRecords.push({
-        id: paymentDoc.id,
-        type: payment.type || "Monthly Fee",
-        description:
-            payment.description ||
-            "Monthly Fee Payment",
-        amount: Number(payment.amount) || 0,
-        status: "Paid",
-        feeDate:
-            payment.paymentDate ||
-            "",
-        paymentMethod:
-            payment.paymentMethod ||
-            "",
-        paymentReference:
-            payment.paymentReference ||
-            ""
-    });
+    id: paymentDoc.id,
+    source: "payments",
+    receiptNumber: payment.receiptNumber || "",
+    feeMonth: payment.feeMonth || "",
+    feeMonthName: payment.feeMonthName || "",
+    type: payment.type || "Monthly Fee",
+    description:
+        payment.description ||
+        "Monthly Fee Payment",
+    amount: Number(payment.amount) || 0,
+    status: "Paid",
+    feeDate:
+        payment.paymentDate ||
+        "",
+    paymentDate:
+        payment.paymentDate ||
+        "",
+    paymentMethod:
+        payment.paymentMethod ||
+        "",
+    paymentReference:
+        payment.paymentReference ||
+        payment.transactionRef ||
+        "",
+    transactionRef:
+        payment.transactionRef ||
+        ""
+});
 
 });
 
@@ -999,7 +1010,7 @@ const monthlyAttendanceHTML =
                                 <br>
 
                                 <button
-                                    onclick="window.location.href='payment-receipt.html?id=${fee.id}'"
+                                    onclick="window.location.href='payment-receipt.html?id=${fee.id}&source=${fee.source}&from=student'"
                                     style="
                                         margin-top:6px;
                                         padding:6px 10px;
