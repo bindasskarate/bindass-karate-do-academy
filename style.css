@@ -132,7 +132,7 @@ section p {
 background:
 linear-gradient(rgba(0,0,0,0.65),
 rgba(0,0,0,0.65)),
-url("images/karatehomepage.jpeg");
+url("karatehomepage.jpeg");
     background-size: cover;
     background-position: center;
     height: 600px;
@@ -484,7 +484,7 @@ section.hero {
     .hero,
     section.hero {
         background-color: transparent !important;
-        background-image: url("images/karatehomepage.jpeg") !important;
+        background-image: url("karatehomepage.jpeg") !important;
         background-size: cover !important;
         background-position: center top !important;
         min-height: 650px;
