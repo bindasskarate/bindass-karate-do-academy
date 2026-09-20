@@ -214,6 +214,81 @@ body {
             Loading student profile...
         </div>
     </div>
+    <div id="changePasswordSection" class="section" style="display:none;">
+
+    <h3>🔐 Change Password</h3>
+
+    <div style="max-width:500px;">
+
+        <input
+            type="password"
+            id="currentPassword"
+            placeholder="Current Password"
+            style="
+                width:100%;
+                padding:12px;
+                margin-bottom:10px;
+                border:1px solid #ddd;
+                border-radius:8px;
+                font-size:15px;
+            "
+        >
+
+        <input
+            type="password"
+            id="newPassword"
+            placeholder="New Password"
+            style="
+                width:100%;
+                padding:12px;
+                margin-bottom:10px;
+                border:1px solid #ddd;
+                border-radius:8px;
+                font-size:15px;
+            "
+        >
+
+        <input
+            type="password"
+            id="confirmPassword"
+            placeholder="Confirm New Password"
+            style="
+                width:100%;
+                padding:12px;
+                margin-bottom:10px;
+                border:1px solid #ddd;
+                border-radius:8px;
+                font-size:15px;
+            "
+        >
+
+        <button
+            id="changePasswordBtn"
+            style="
+                width:100%;
+                padding:12px;
+                border:none;
+                border-radius:8px;
+                background:#111;
+                color:white;
+                font-weight:bold;
+                cursor:pointer;
+            "
+        >
+            🔐 Change Password
+        </button>
+
+        <p
+            id="passwordMessage"
+            style="
+                margin-top:12px;
+                font-size:14px;
+            "
+        ></p>
+
+    </div>
+
+</div>
 
 </main>
 
@@ -224,9 +299,11 @@ from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 
 import {
     getAuth,
-    onAuthStateChanged
-}
-from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+    onAuthStateChanged,
+    EmailAuthProvider,
+    reauthenticateWithCredential,
+    updatePassword
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
 let currentStudent = null;
 
@@ -392,6 +469,161 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const profile = document.getElementById("profile");
+// ==========================================
+// CHANGE STUDENT PASSWORD
+// ==========================================
+
+const changePasswordSection =
+    document.getElementById("changePasswordSection");
+
+const changePasswordBtn =
+    document.getElementById("changePasswordBtn");
+
+const passwordMessage =
+    document.getElementById("passwordMessage");
+
+
+if (studentMode) {
+    changePasswordSection.style.display = "block";
+}
+
+
+changePasswordBtn.addEventListener("click", async () => {
+
+    const user = auth.currentUser;
+
+    if (!user) {
+        passwordMessage.textContent =
+            "Please login again before changing your password.";
+        return;
+    }
+
+    const currentPassword =
+        document.getElementById("currentPassword").value;
+
+    const newPassword =
+        document.getElementById("newPassword").value;
+
+    const confirmPassword =
+        document.getElementById("confirmPassword").value;
+
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+
+        passwordMessage.textContent =
+            "Please fill in all password fields.";
+
+        return;
+    }
+
+
+    if (newPassword !== confirmPassword) {
+
+        passwordMessage.textContent =
+            "New passwords do not match.";
+
+        return;
+    }
+
+
+    if (newPassword.length < 6) {
+
+        passwordMessage.textContent =
+            "New password must be at least 6 characters.";
+
+        return;
+    }
+
+
+    if (currentPassword === newPassword) {
+
+        passwordMessage.textContent =
+            "New password must be different from your current password.";
+
+        return;
+    }
+
+
+    passwordMessage.textContent =
+        "Changing password...";
+
+
+    try {
+
+        const credential =
+            EmailAuthProvider.credential(
+                user.email,
+                currentPassword
+            );
+
+
+        // Verify current password
+        await reauthenticateWithCredential(
+            user,
+            credential
+        );
+
+
+        // Set new password
+        await updatePassword(
+            user,
+            newPassword
+        );
+
+
+        passwordMessage.textContent =
+            "✅ Password changed successfully!";
+
+
+        document.getElementById("currentPassword").value = "";
+        document.getElementById("newPassword").value = "";
+        document.getElementById("confirmPassword").value = "";
+
+
+    } catch (error) {
+
+        console.error(
+            "Password change error:",
+            error
+        );
+
+
+        if (
+            error.code ===
+            "auth/invalid-credential" ||
+            error.code ===
+            "auth/wrong-password"
+        ) {
+
+            passwordMessage.textContent =
+                "❌ Current password is incorrect.";
+
+        } else if (
+            error.code ===
+            "auth/weak-password"
+        ) {
+
+            passwordMessage.textContent =
+                "❌ New password is too weak.";
+
+        } else if (
+            error.code ===
+            "auth/requires-recent-login"
+        ) {
+
+            passwordMessage.textContent =
+                "❌ Please logout and login again, then change your password.";
+
+        } else {
+
+            passwordMessage.textContent =
+                "❌ Unable to change password. Please try again.";
+
+        }
+
+    }
+
+});
 
 
 /* GET STUDENT ID FROM URL */
@@ -690,7 +922,7 @@ const monthlyAttendanceHTML =
                     { month: "long", year: "numeric" }
                 );
 
-            return `
+            return `getAuth
                 <div style="
                     display:flex;
                     justify-content:space-between;
