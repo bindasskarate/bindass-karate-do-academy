@@ -484,10 +484,10 @@ section.hero {
     .hero,
     section.hero {
         background-color: transparent !important;
-        background-image: url("karatehomepage.jpeg") !important;
+        background-image: url("images/karatehomepage.jpeg") !important;
         background-size: cover !important;
         background-position: center top !important;
-        min: height 650px;
+        min-height: 650px;
     }
 
     .hero h1 {
