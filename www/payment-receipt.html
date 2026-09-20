@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Payment Receipt - Bindass Karate Do Academy</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px;
+            background: #f2f2f2;
+            font-family: Arial, sans-serif;
+        }
+
+        .receipt {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.12);
+        }
+
+.receipt-logo {
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 12px;
+}
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #222;
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .header p {
+            margin: 6px 0;
+            color: #555;
+        }
+
+        .receipt-title {
+            text-align: center;
+            margin: 25px 0;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .receipt-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .info-box {
+            padding: 12px;
+            background: #f7f7f7;
+            border-radius: 6px;
+        }
+
+        .info-box strong {
+            display: block;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .amount-box {
+            margin-top: 25px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid #222;
+            border-radius: 8px;
+        }
+
+        .amount-box span {
+            display: block;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .amount-box strong {
+            font-size: 30px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .paid {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #666;
+        }
+
+        .print-btn {
+            display: block;
+            margin: 25px auto 0;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            background: #111;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        @media print {
+
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .receipt {
+                box-shadow: none;
+                max-width: 100%;
+            }
+
+            .print-btn {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            body {
+                padding: 10px;
+            }
+
+            .receipt {
+                padding: 20px;
+            }
+
+            .receipt-info {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="receipt">
+
+    <div class="header">
+
+<img
+    src="bindasslogo.jpeg"
+    alt="Bindass Karate Do Academy Logo"
+    class="receipt-logo"
+>
+
+        <h1>Bindass Karate Do Academy</h1>
+
+        <p>Satgaon, Guwahati, Assam</p>
+
+        <p>
+            📞 7636885457 / 9365061525
+        </p>
+
+        <p>
+            📧 bindasskarate786@gmail.com
+        </p>
+
+    </div>
+
+
+    <div class="receipt-title">
+        PAYMENT RECEIPT
+    </div>
+
+
+    <div class="receipt-info">
+
+        <div class="info-box">
+            <strong>Receipt No.</strong>
+            <span id="receiptNumber">-</span>
+        </div>
+
+        <div class="info-box">
+            <strong>Payment Date</strong>
+            <span id="paymentDate">-</span>
+        </div>
+
+        <div class="info-box">
+            <strong>Student Name</strong>
+            <span id="studentName">-</span>
+        </div>
+
+        <div class="info-box">
+            <strong>Fee Type</strong>
+            <span id="feeType">-</span>
+        </div>
+
+        <div class="info-box">
+            <strong>Fee Month</strong>
+            <span id="feeMonth">-</span>
+        </div>
+
+        <div class="info-box">
+            <strong>Payment Method</strong>
+            <span id="paymentMethod">-</span>
+        </div>
+
+        <div class="info-box">
+            <strong>Reference / UTR</strong>
+            <span id="paymentReference">-</span>
+        </div>
+
+    </div>
+
+
+    <div class="amount-box">
+
+        <span>Amount Paid</span>
+
+        <strong id="amount">
+            ₹0
+        </strong>
+
+    </div>
+
+
+    <div class="paid">
+        ✓ PAYMENT RECEIVED
+    </div>
+
+
+    <div class="footer">
+
+        Thank you for your payment.
+
+        <br><br>
+
+        <strong>Bindass Karate Do Academy</strong>
+
+    </div>
+
+
+    <button
+    class="print-btn"
+    onclick="printReceipt()"
+>
+    🖨️ Print / Save as PDF
+</button>
+</div>
+
+
+<script type="module">
+
+   
+import {
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+import {
+    getAuth,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+import {
+    getFirestore,
+    doc,
+    getDoc
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCDpKF59MATfa-JaGF9yOBvHyi8i__3CFc",
+    authDomain: "bindass-karate-do-academy.firebaseapp.com",
+    projectId: "bindass-karate-do-academy",
+    storageBucket: "bindass-karate-do-academy.firebasestorage.app",
+    messagingSenderId: "360953215088",
+    appId: "1:360953215088:web:c4399bcd991abf98229cb5",
+    measurementId: "G-FWLX780V9Q"
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+const auth = getAuth(app);
+
+// GET ID AND SOURCE FROM URL
+
+const params =
+    new URLSearchParams(window.location.search);
+
+const recordId =
+    params.get("id");
+
+const source =
+    params.get("source") || "payments";
+
+
+// LOAD RECEIPT
+
+async function loadReceipt() {
+
+    if (!recordId) {
+
+        alert("Receipt record not found.");
+
+        return;
+    }
+
+
+    try {
+
+        let receiptData = null;
+
+
+        // ==============================
+        // LOAD FROM FEES
+        // ==============================
+
+        if (source === "fees") {
+
+            const feeSnap =
+                await getDoc(
+                    doc(db, "fees", recordId)
+                );
+
+
+            if (!feeSnap.exists()) {
+
+                alert("Fee record not found.");
+
+                return;
+            }
+
+
+            receiptData =
+                feeSnap.data();
+
+        }
+
+
+        // ==============================
+        // LOAD FROM PAYMENTS
+        // ==============================
+
+        else {
+
+            const paymentSnap =
+                await getDoc(
+                    doc(db, "payments", recordId)
+                );
+
+
+            if (!paymentSnap.exists()) {
+
+                alert("Payment record not found.");
+
+                return;
+            }
+
+
+            receiptData =
+                paymentSnap.data();
+
+        }
+
+
+        // ==============================
+        // DISPLAY RECEIPT
+        // ==============================
+
+        document.getElementById("receiptNumber")
+            .textContent =
+            receiptData.receiptNumber || "-";
+
+
+
+        document.getElementById("paymentDate")
+            .textContent =
+            receiptData.paymentDate ||
+            receiptData.feeDate ||
+            "-";
+
+
+        document.getElementById("studentName")
+            .textContent =
+            receiptData.studentName || "-";
+
+
+        document.getElementById("feeType")
+            .textContent =
+            receiptData.type || "Fee";
+
+
+        document.getElementById("feeMonth")
+            .textContent =
+            receiptData.feeMonthName ||
+            receiptData.feeMonth ||
+            receiptData.description ||
+            "-";
+
+
+        document.getElementById("paymentMethod")
+            .textContent =
+            receiptData.paymentMethod || "-";
+
+
+        document.getElementById("paymentReference")
+            .textContent =
+            receiptData.paymentReference ||
+            receiptData.transactionRef ||
+            "-";
+
+
+        document.getElementById("amount")
+            .textContent =
+            "₹" +
+            (Number(receiptData.amount) || 0);
+
+    }
+
+
+    catch (error) {
+
+        console.error(
+            "Receipt loading error:",
+            error
+        );
+
+        alert(
+            "Unable to load receipt.\n\n" +
+            error.message
+        );
+
+    }
+
+}
+
+
+onAuthStateChanged(auth, (user) => {
+
+    if (user) {
+
+        loadReceipt();
+
+    } else {
+
+        alert("Please login first.");
+
+    }
+
+});
+window.printReceipt = async function () {
+    try {
+
+        // Android Capacitor app
+        if (window.Capacitor?.isNativePlatform?.()) {
+
+            const Printer = window.Capacitor?.Plugins?.Printer;
+
+            if (!Printer) {
+                alert("Printer plugin is not available.");
+                return;
+            }
+
+            await Printer.printWebView({
+                name: "BKD Payment Receipt"
+            });
+
+            return;
+        }
+
+        // Normal website
+        window.print();
+
+    } catch (error) {
+
+        console.error("Print error:", error);
+
+        alert(
+            "Unable to open print dialog.\n\n" +
+            error.message
+        );
+    }
+};
+
+</script>
+</body>
+</html>

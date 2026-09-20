@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Fee Management | Bindass Karate Do Academy</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    color: #222;
+}
+
+.header {
+    background: #111;
+    color: white;
+    padding: 20px;
+}
+
+.header h1 {
+    font-size: 24px;
+}
+
+.header p {
+    color: #bbb;
+    margin-top: 5px;
+    font-size: 13px;
+}
+
+.container {
+    width: min(1200px, 94%);
+    margin: 25px auto;
+}
+
+.back-btn {
+    border: none;
+    background: #333;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.summary-card {
+    background: white;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+}
+
+.summary-card strong {
+    display: block;
+    color: #777;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.summary-card span {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.section {
+    background: white;
+    padding: 22px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+}
+
+.section h2 {
+    font-size: 20px;
+    margin-bottom: 18px;
+}
+
+.search-box {
+    display: flex;
+    gap: 10px;
+}
+
+.search-box input {
+    flex: 1;
+    padding: 13px;
+    border: 1px solid #ddd;
+    border-radius: 9px;
+    font-size: 15px;
+}
+
+.student-list {
+    margin-top: 15px;
+}
+
+.student-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    margin-bottom: 8px;
+}
+
+.student-name {
+    font-weight: bold;
+}
+
+.student-phone {
+    font-size: 12px;
+    color: #777;
+    margin-top: 4px;
+}
+
+.select-btn {
+    border: none;
+    background: #111;
+    color: white;
+    padding: 8px 13px;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.selected-student {
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 18px;
+}
+
+.selected-student strong {
+    font-size: 18px;
+}
+
+.primary-btn {
+    border: none;
+    background: #111;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.cancel-btn {
+    border: none;
+    background: #eee;
+    color: #333;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 8px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.full {
+    grid-column: 1 / -1;
+}
+
+.fee-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.fee-table th,
+.fee-table td {
+    padding: 13px 10px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+    font-size: 13px;
+}
+
+.fee-table th {
+    color: #777;
+    font-size: 12px;
+}
+
+.status {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.status-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-paid {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.action-btn {
+    border: none;
+    padding: 7px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: bold;
+    margin: 2px;
+}
+
+.edit-btn {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+.paid-btn {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.empty {
+    color: #777;
+    padding: 20px 0;
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+}
+
+.modal-content {
+    background: white;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 16px;
+    padding: 25px;
+}
+
+.modal-content h2 {
+    margin-bottom: 20px;
+}
+
+@media (max-width: 700px) {
+
+    .summary-grid,
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .fee-table {
+        min-width: 750px;
+    }
+
+    .section {
+        overflow-x: auto;
+    }
+
+    .search-box {
+        flex-direction: column;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header class="header">
+
+    <h1>💳 Bindass Karate Do Academy</h1>
+
+    <p>Fee Management</p>
+
+</header>
+
+<main class="container">
+
+<button
+    class="back-btn"
+    onclick="window.location.href='admin.html'"
+>
+    ← Back to Dashboard
+</button>
+
+<div class="summary-grid">
+
+    <div class="summary-card">
+        <strong>Total Fees</strong>
+        <span id="totalFees">₹0</span>
+    </div>
+
+    <div class="summary-card">
+        <strong>Total Paid</strong>
+        <span id="totalPaid">₹0</span>
+    </div>
+
+    <div class="summary-card">
+        <strong>Total Pending</strong>
+        <span id="totalPending">₹0</span>
+    </div>
+
+</div>
+
+<div class="section">
+
+    <h2>👤 Select Student</h2>
+
+    <div class="search-box">
+
+        <input
+            type="text"
+            id="studentSearch"
+            placeholder="Search by student name or phone..."
+        >
+
+    </div>
+
+    <div id="studentList" class="student-list">
+
+        <div class="empty">
+            Loading students...
+        </div>
+
+    </div>
+
+</div>
+
+<div
+    id="studentFeeSection"
+    class="section hidden"
+>
+
+    <div class="selected-student">
+
+        <strong id="selectedStudentName">-</strong>
+
+        <div
+            id="selectedStudentPhone"
+            style="color:#777;margin-top:5px;"
+        >
+            -
+        </div>
+
+    </div>
+
+    <button
+        class="primary-btn"
+        onclick="openFeeModal()"
+    >
+        + Add Fee
+    </button>
+    
+    <button
+    class="primary-btn"
+    onclick="markMonthlyFeePaid()"
+    style="margin-left:10px;"
+>
+    ✓ Mark Monthly Fee Paid
+</button>
+
+    <div style="margin-top:20px;overflow-x:auto;">
+
+        <table class="fee-table">
+
+            <thead>
+
+                <tr>
+                    <th>Fee Type</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+
+            </thead>
+
+            <tbody id="feeTableBody"></tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</main>
+
+<div id="feeModal" class="modal">
+
+    <div class="modal-content">
+
+        <h2 id="feeModalTitle">Add Fee</h2>
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label>Fee Type *</label>
+
+                <select id="feeType">
+
+                    <option value="Monthly Fee">Monthly Fee</option>
+                    <option value="Tournament">Tournament</option>
+                    <option value="Equipment">Equipment</option>
+                    <option value="Exam">Exam</option>
+                    <option value="Belt Grading">Belt Grading</option>
+                    <option value="Membership">Membership</option>
+                    <option value="Uniform">Uniform</option>
+                    <option value="Other">Other</option>
+
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Amount (₹) *</label>
+
+                <input
+                    type="number"
+                    id="feeAmount"
+                    min="0"
+                    placeholder="Enter amount"
+                >
+
+            </div>
+
+            <div class="form-group full">
+
+                <label>Description</label>
+
+                <input
+                    type="text"
+                    id="feeDescription"
+                    placeholder="Example: October Monthly Fee"
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Fee Date</label>
+
+                <input
+                    type="date"
+                    id="feeDate"
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Status</label>
+
+                <select id="feeStatus">
+
+                    <option value="Pending">Pending</option>
+                    <option value="Paid">Paid</option>
+
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Payment Method</label>
+
+                <select id="paymentMethod">
+
+                    <option value="">Not Paid</option>
+                    <option value="Cash">Cash</option>
+                    <option value="UPI">UPI</option>
+                    <option value="Bank Transfer">Bank Transfer</option>
+                    <option value="Online">Online</option>
+                    <option value="Other">Other</option>
+
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Payment Reference</label>
+
+                <input
+                    type="text"
+                    id="paymentReference"
+                    placeholder="Optional UTR / receipt no."
+                >
+
+            </div>
+
+            <div class="form-group full">
+
+                <label>Note</label>
+
+                <textarea
+                    id="feeNote"
+                    placeholder="Optional note..."
+                ></textarea>
+
+            </div>
+
+        </div>
+
+        <div style="margin-top:20px;">
+
+            <button
+                class="primary-btn"
+                onclick="saveFee()"
+            >
+                Save Fee
+            </button>
+
+            <button
+                class="cancel-btn"
+                onclick="closeFeeModal()"
+            >
+                Cancel
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+<script type="module">
+
+import {
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+import {
+    getAuth,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+import {
+    getFirestore,
+    collection,
+    getDocs,
+    addDoc,
+    doc,
+    getDoc,
+    updateDoc,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
+/* FIREBASE */
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCDpKF59MATfa-JaGF9yOBvHyi8i__3CFc",
+    authDomain: "bindass-karate-do-academy.firebaseapp.com",
+    projectId: "bindass-karate-do-academy",
+    storageBucket: "bindass-karate-do-academy.firebasestorage.app",
+    messagingSenderId: "360953215088",
+    appId: "1:360953215088:web:c4399bcd991abf98229cb5",
+    measurementId: "G-FWLX780V9Q"
+};
+
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+
+/* VARIABLES */
+
+let students = [];
+let selectedStudent = null;
+let editingFeeId = null;
+let selectedStudentFees = [];
+
+
+/* ELEMENTS */
+
+const studentList =
+    document.getElementById("studentList");
+
+const studentSearch =
+    document.getElementById("studentSearch");
+
+
+/* LOAD STUDENTS */
+
+async function loadStudents() {
+
+    const snapshot =
+        await getDocs(collection(db, "students"));
+
+    students = [];
+
+    snapshot.forEach(studentDoc => {
+
+        students.push({
+            id: studentDoc.id,
+            ...studentDoc.data()
+        });
+
+    });
+
+    students.sort((a, b) =>
+        (a.name || "").localeCompare(b.name || "")
+    );
+
+    renderStudents(students);
+}
+
+
+/* SHOW STUDENTS */
+
+function renderStudents(list) {
+
+    if (!list.length) {
+
+        studentList.innerHTML = `
+            <div class="empty">
+                No students found.
+            </div>
+        `;
+
+        return;
+    }
+
+    studentList.innerHTML = list.map(student => `
+
+        <div class="student-item">
+
+            <div>
+
+                <div class="student-name">
+                    ${escapeHTML(student.name || "Unnamed")}
+                </div>
+
+                <div class="student-phone">
+                    ${escapeHTML(student.phone || "-")}
+                </div>
+
+            </div>
+
+            <button
+                class="select-btn"
+                onclick="selectStudent('${student.id}')"
+            >
+                Manage Fees
+            </button>
+
+        </div>
+
+    `).join("");
+}
+
+
+/* SEARCH STUDENTS */
+
+studentSearch.addEventListener("input", () => {
+
+    const query =
+        studentSearch.value.trim().toLowerCase();
+
+    const filtered =
+        students.filter(student =>
+
+            (student.name || "")
+                .toLowerCase()
+                .includes(query)
+
+            ||
+
+            (student.phone || "")
+                .toLowerCase()
+                .includes(query)
+
+        );
+
+    renderStudents(filtered);
+});
+
+
+/* SELECT STUDENT */
+
+window.selectStudent = async function(studentId) {
+
+    selectedStudent =
+        students.find(student =>
+            student.id === studentId
+        );
+
+    if (!selectedStudent) return;
+
+
+    document.getElementById(
+        "studentFeeSection"
+    ).classList.remove("hidden");
+
+
+    document.getElementById(
+        "selectedStudentName"
+    ).textContent =
+        selectedStudent.name || "Unnamed Student";
+
+
+    document.getElementById(
+        "selectedStudentPhone"
+    ).textContent =
+        selectedStudent.phone || "-";
+
+
+    await loadStudentFees();
+
+    document.getElementById(
+        "studentFeeSection"
+    ).scrollIntoView({
+        behavior: "smooth"
+    });
+
+};
+
+
+/* LOAD SELECTED STUDENT FEES */
+
+async function loadStudentFees() {
+
+    if (!selectedStudent) return;
+
+
+    const snapshot =
+        await getDocs(collection(db, "fees"));
+
+
+    selectedStudentFees = [];
+
+
+    snapshot.forEach(feeDoc => {
+
+        const fee = feeDoc.data();
+
+        if (
+            fee.studentId === selectedStudent.id
+        ) {
+
+            selectedStudentFees.push({
+                id: feeDoc.id,
+                ...fee
+            });
+
+        }
+
+    });
+
+
+    selectedStudentFees.sort((a, b) =>
+        (b.feeDate || "")
+            .localeCompare(a.feeDate || "")
+    );
+
+
+    renderFees(selectedStudentFees);
+
+    updateSummary();
+
+}
+
+
+/* DISPLAY FEES */
+
+function renderFees(fees) {
+
+    const body =
+        document.getElementById("feeTableBody");
+
+
+    if (!fees.length) {
+
+        body.innerHTML = `
+            <tr>
+                <td colspan="6" class="empty">
+                    No fee records found.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+
+    body.innerHTML =
+        fees.map(fee => `
+
+            <tr>
+
+                <td>
+                    <strong>
+                        ${escapeHTML(fee.type || "-")}
+                    </strong>
+                </td>
+
+                <td>
+                    ${escapeHTML(fee.description || "-")}
+                </td>
+
+                <td>
+                    ₹${Number(fee.amount || 0)}
+                </td>
+
+                <td>
+
+                    <span class="
+                        status
+                        ${
+                            fee.status === "Paid"
+                                ? "status-paid"
+                                : "status-pending"
+                        }
+                    ">
+
+                        ${escapeHTML(
+                            fee.status || "Pending"
+                        )}
+
+                    </span>
+
+                </td>
+
+                <td>
+                    ${escapeHTML(
+                        fee.paymentDate ||
+                        fee.feeDate ||
+                        "-"
+                    )}
+                </td>
+
+                <td>
+
+                    ${
+                        fee.status !== "Paid"
+                        ? `
+                            <button
+                                class="action-btn paid-btn"
+                                onclick="markFeePaid('${fee.id}')"
+                            >
+                                ✓ Mark Paid
+                            </button>
+                        `
+                        : `
+                            ${
+                                fee.receiptNumber
+                                ? `
+                                    <button
+                                        class="action-btn"
+                                        onclick="window.location.href='payment-receipt.html?id=${fee.id}&source=fees'"
+                                        style="
+                                            background:#2563eb;
+                                            color:white;
+                                            margin-bottom:5px;
+                                        "
+                                    >
+                                        🧾 View Receipt
+                                    </button>
+                                  `
+                                : `
+                                    <button
+                                        class="action-btn"
+                                        onclick="generateFeeReceipt('${fee.id}')"
+                                        style="
+                                            background:#2563eb;
+                                            color:white;
+                                            margin-bottom:5px;
+                                        "
+                                    >
+                                        🧾 Generate Receipt
+                                    </button>
+                                  `
+                            }
+                        `
+                    }
+
+                    <button
+                        class="action-btn edit-btn"
+                        onclick="editFee('${fee.id}')"
+                    >
+                        Edit
+                    </button>
+
+                </td>
+
+            </tr>
+
+        `).join("");
+}
+
+
+/* OVERALL SUMMARY */
+
+async function updateSummary() {
+
+    const snapshot =
+        await getDocs(collection(db, "fees"));
+
+
+    let total = 0;
+    let paid = 0;
+    let pending = 0;
+
+
+    snapshot.forEach(feeDoc => {
+
+        const fee = feeDoc.data();
+
+        const amount =
+            Number(fee.amount) || 0;
+
+
+        total += amount;
+
+
+        if (fee.status === "Paid") {
+
+            paid += amount;
+
+        } else {
+
+            pending += amount;
+
+        }
+
+    });
+
+
+    document.getElementById(
+        "totalFees"
+    ).textContent = "₹" + total;
+
+
+    document.getElementById(
+        "totalPaid"
+    ).textContent = "₹" + paid;
+
+
+    document.getElementById(
+        "totalPending"
+    ).textContent = "₹" + pending;
+
+}
+
+
+/* OPEN ADD FEE */
+
+window.openFeeModal = function() {
+
+    if (!selectedStudent) {
+
+        alert("Please select a student first.");
+
+        return;
+    }
+
+
+    editingFeeId = null;
+
+
+    document.getElementById(
+        "feeModalTitle"
+    ).textContent = "Add Fee";
+
+
+    document.getElementById(
+        "feeType"
+    ).value = "Monthly Fee";
+
+
+    document.getElementById(
+        "feeAmount"
+    ).value = "";
+
+
+    document.getElementById(
+        "feeDescription"
+    ).value = "";
+
+
+    document.getElementById(
+        "feeDate"
+    ).value =
+        new Date().toISOString().slice(0, 10);
+
+
+    document.getElementById(
+        "feeStatus"
+    ).value = "Pending";
+
+
+    document.getElementById(
+        "paymentMethod"
+    ).value = "";
+
+
+    document.getElementById(
+        "paymentReference"
+    ).value = "";
+
+
+    document.getElementById(
+        "feeNote"
+    ).value = "";
+
+
+    document.getElementById(
+        "feeModal"
+    ).style.display = "flex";
+
+};
+
+
+/* CLOSE MODAL */
+
+window.closeFeeModal = function() {
+
+    document.getElementById(
+        "feeModal"
+    ).style.display = "none";
+
+};
+
+
+/* SAVE FEE */
+
+window.saveFee = async function() {
+
+    if (!selectedStudent) {
+
+        alert("Please select a student.");
+
+        return;
+    }
+
+
+    const amount =
+        Number(
+            document.getElementById("feeAmount").value
+        );
+
+
+    if (!amount || amount <= 0) {
+
+        alert("Please enter a valid fee amount.");
+
+        return;
+    }
+
+
+    const feeData = {
+
+        studentId:
+            selectedStudent.id,
+
+        studentName:
+            selectedStudent.name || "",
+
+        type:
+            document.getElementById("feeType").value,
+
+        description:
+            document.getElementById("feeDescription").value.trim(),
+
+        amount:
+            amount,
+
+        status:
+            document.getElementById("feeStatus").value,
+
+        feeDate:
+            document.getElementById("feeDate").value,
+
+        paymentMethod:
+            document.getElementById("paymentMethod").value,
+
+        paymentReference:
+            document.getElementById("paymentReference").value.trim(),
+
+        note:
+            document.getElementById("feeNote").value.trim(),
+
+        updatedAt:
+            serverTimestamp()
+
+    };
+
+
+    try {
+
+        if (editingFeeId) {
+
+            await updateDoc(
+                doc(db, "fees", editingFeeId),
+                feeData
+            );
+
+            alert("Fee updated successfully.");
+
+        } else {
+
+            await addDoc(
+                collection(db, "fees"),
+                {
+                    ...feeData,
+                    createdAt: serverTimestamp()
+                }
+            );
+
+            alert("Fee added successfully.");
+
+        }
+
+
+        closeFeeModal();
+
+        await loadStudentFees();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Unable to save fee.\n\n" +
+            error.message
+        );
+
+    }
+
+};
+
+
+/* EDIT FEE */
+
+window.editFee = async function(feeId) {
+
+    try {
+
+        const feeSnap =
+            await getDoc(
+                doc(db, "fees", feeId)
+            );
+
+
+        if (!feeSnap.exists()) {
+
+            alert("Fee record not found.");
+
+            return;
+        }
+
+
+        const fee =
+            feeSnap.data();
+
+
+        editingFeeId = feeId;
+
+
+        document.getElementById(
+            "feeModalTitle"
+        ).textContent = "Edit Fee";
+
+
+        document.getElementById(
+            "feeType"
+        ).value =
+            fee.type || "Other";
+
+
+        document.getElementById(
+            "feeAmount"
+        ).value =
+            fee.amount || "";
+
+
+        document.getElementById(
+            "feeDescription"
+        ).value =
+            fee.description || "";
+
+
+        document.getElementById(
+            "feeDate"
+        ).value =
+            fee.feeDate || "";
+
+
+        document.getElementById(
+            "feeStatus"
+        ).value =
+            fee.status || "Pending";
+
+
+        document.getElementById(
+            "paymentMethod"
+        ).value =
+            fee.paymentMethod || "";
+
+
+        document.getElementById(
+            "paymentReference"
+        ).value =
+            fee.paymentReference || "";
+
+
+        document.getElementById(
+            "feeNote"
+        ).value =
+            fee.note || "";
+
+
+        document.getElementById(
+            "feeModal"
+        ).style.display = "flex";
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Unable to load fee record.");
+
+    }
+
+};
+
+/* GENERATE RECEIPT FOR OLD PAID FEE */
+
+window.generateFeeReceipt = async function(feeId) {
+
+    try {
+
+        const feeRef =
+            doc(db, "fees", feeId);
+
+        const feeSnap =
+            await getDoc(feeRef);
+
+
+        if (!feeSnap.exists()) {
+
+            alert("Fee record not found.");
+
+            return;
+        }
+
+
+        const fee =
+            feeSnap.data();
+
+
+        if (fee.status !== "Paid") {
+
+            alert(
+                "Receipt can only be generated for Paid fees."
+            );
+
+            return;
+        }
+
+
+        let receiptNumber =
+            fee.receiptNumber;
+
+
+        if (!receiptNumber) {
+
+            receiptNumber =
+                "BKD-" +
+                new Date().getFullYear() +
+                "-" +
+                Date.now();
+
+
+            await updateDoc(
+                feeRef,
+                {
+                    receiptNumber:
+                        receiptNumber,
+
+                    updatedAt:
+                        serverTimestamp()
+                }
+            );
+
+        }
+
+
+        window.location.href =
+            "payment-receipt.html?id=" +
+            feeId +
+            "&source=fees";
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Unable to generate receipt.\n\n" +
+            error.message
+        );
+
+    }
+
+};
+
+/* MARK FEE PAID */
+
+window.markFeePaid = async function(feeId) {
+
+    const confirmPaid = confirm(
+        "Mark this fee as Paid?\n\n" +
+        "This will update the student's fee record."
+    );
+
+    if (!confirmPaid) return;
+
+
+    const paymentMethod = prompt(
+        "Payment Method:\n\n" +
+        "Enter: Cash / UPI / Bank Transfer / Online / Other",
+        "Cash"
+    );
+
+    if (paymentMethod === null) return;
+
+
+    const paymentReference = prompt(
+        "Payment Reference / UTR (optional):",
+        ""
+    );
+
+
+    const receiptNumber =
+        "BKD-" +
+        new Date().getFullYear() +
+        "-" +
+        Date.now();
+
+
+    try {
+
+        await updateDoc(
+            doc(db, "fees", feeId),
+            {
+                status: "Paid",
+
+                paymentMethod:
+                    paymentMethod || "Cash",
+
+                paymentReference:
+                    paymentReference || "",
+
+                paymentDate:
+                    new Date()
+                        .toISOString()
+                        .slice(0, 10),
+
+                receiptNumber:
+                    receiptNumber,
+
+                updatedAt:
+                    serverTimestamp()
+            }
+        );
+
+
+        alert(
+            "Fee marked as Paid successfully!\n\n" +
+            "Receipt No: " +
+            receiptNumber
+        );
+
+
+        await loadStudentFees();
+
+        await updateSummary();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Unable to update payment. Please try again."
+        );
+
+    }
+
+};
+
+/* ESCAPE HTML */
+
+function escapeHTML(value) {
+
+    return String(value)
+
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
+
+
+/* ADMIN AUTH */
+
+onAuthStateChanged(auth, async (user) => {
+
+    if (!user) {
+
+        window.location.href = "login.html";
+
+        return;
+    }
+
+
+    try {
+
+        await loadStudents();
+
+        await updateSummary();
+
+    } catch (error) {
+
+        console.error(error);
+
+        studentList.innerHTML = `
+            <div class="empty">
+                Unable to load students.
+            </div>
+        `;
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>

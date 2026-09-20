@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attendance History | Bindass Karate Do Academy</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+}
+
+header {
+    background: #18212b;
+    color: white;
+    text-align: center;
+    padding: 25px;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 25px auto;
+    padding: 20px;
+}
+
+.controls {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+input, button {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+}
+
+button {
+    background: #18212b;
+    color: white;
+    cursor: pointer;
+    border: none;
+}
+
+.summary {
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+.student {
+    background: white;
+    margin: 10px 0;
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.present {
+    color: green;
+    font-weight: bold;
+}
+
+.absent {
+    color: red;
+    font-weight: bold;
+}
+
+@media(max-width:600px) {
+    .student {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🥋 Bindass Karate Do Academy</h1>
+    <div>Attendance History</div>
+</header>
+
+<div class="container">
+
+    <div class="controls">
+        <label><b>Select Date:</b></label>
+        <input type="date" id="historyDate">
+
+        <button onclick="loadHistory()">
+            🔍 View Attendance
+        </button>
+
+        <div class="summary" id="summary"></div>
+    </div>
+
+    <div id="historyList">
+        Select a date to view attendance.
+    </div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+import {
+    getFirestore,
+    doc,
+    getDoc
+}
+from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+import {
+    getAuth,
+    onAuthStateChanged
+}
+from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCDpKF59MATfa-JaGF9yOBvHyi8i__3CFc",
+  authDomain: "bindass-karate-do-academy.firebaseapp.com",
+  projectId: "bindass-karate-do-academy",
+  storageBucket: "bindass-karate-do-academy.firebasestorage.app",
+  messagingSenderId: "360953215088",
+  appId: "1:360953215088:web:c4399bcd991abf98229cb5",
+  measurementId: "G-FWLX780V9Q"
+};
+
+
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+
+const historyDate = document.getElementById("historyDate");
+const historyList = document.getElementById("historyList");
+const summary = document.getElementById("summary");
+
+
+const today = new Date().toISOString().split("T")[0];
+historyDate.value = today;
+
+
+window.loadHistory = async function() {
+
+    const date = historyDate.value;
+
+    if (!date) {
+        alert("Please select a date.");
+        return;
+    }
+
+    historyList.innerHTML = "Loading...";
+
+    try {
+
+        const attendanceRef = doc(db, "attendance", date);
+        const attendanceSnap = await getDoc(attendanceRef);
+
+        if (!attendanceSnap.exists()) {
+            historyList.innerHTML = "No attendance found for this date.";
+            summary.innerHTML = "";
+            return;
+        }
+
+        const data = attendanceSnap.data();
+
+const records = data.records || {};
+
+const studentNames = data.studentNames || {};
+
+        let present = 0;
+        let absent = 0;
+
+        historyList.innerHTML = "";
+
+        Object.entries(records).forEach(async ([studentId, status], index) => {
+
+            if (status === "Present") present++;
+            if (status === "Absent") absent++;
+
+            const studentName =
+    studentNames[studentId] || studentId;
+            const div = document.createElement("div");
+            div.className = "student";
+
+            div.innerHTML = `
+                <div>
+                    <b>${index + 1}. ${studentName}</b>
+                </div>
+
+                <div class="${status === "Present" ? "present" : "absent"}">
+                    ${status === "Present" ? "✓ Present" : "✕ Absent"}
+                </div>
+            `;
+
+            historyList.appendChild(div);
+        });
+
+        summary.innerHTML =
+            `Total: ${present + absent} &nbsp; | &nbsp;
+             Present: ${present} &nbsp; | &nbsp;
+             Absent: ${absent}`;
+
+    } catch (error) {
+
+        console.error(error);
+
+        historyList.innerHTML =
+            "Unable to load attendance.";
+
+        console.log(error.message);
+    }
+};
+
+
+
+</script>
+
+</body>
+</html>
