@@ -469,6 +469,16 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const profile = document.getElementById("profile");
+
+
+
+/* GET STUDENT ID FROM URL */
+
+const params = new URLSearchParams(window.location.search);
+
+const studentMode = params.get("student") === "1";
+
+let studentId = params.get("id");
 // ==========================================
 // CHANGE STUDENT PASSWORD
 // ==========================================
@@ -624,16 +634,6 @@ changePasswordBtn.addEventListener("click", async () => {
     }
 
 });
-
-
-/* GET STUDENT ID FROM URL */
-
-const params = new URLSearchParams(window.location.search);
-
-const studentMode = params.get("student") === "1";
-
-let studentId = params.get("id");
-
 
 /* LOAD PROFILE */
 
