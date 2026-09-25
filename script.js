@@ -1,3 +1,8 @@
+/* =====================================================
+   BKDA WEBSITE JAVASCRIPT
+   ===================================================== */
+
+
 /* ===== HOME MENU ONLY ===== */
 
 (function () {
@@ -14,87 +19,193 @@
     }
 
 })();
-// ===== Gallery Lightbox =====
 
-const galleryImages = document.querySelectorAll('.gallery-container img');
-const lightbox = document.getElementById('lightbox');
-const lightboxImg = document.getElementById('lightbox-img');
-const closeBtn = document.querySelector('.close');
 
-galleryImages.forEach(img => {
-    img.addEventListener('click', () => {
-        lightbox.style.display = 'flex';
-        lightboxImg.src = img.src;
-    });
-});
+/* =====================================================
+   GALLERY FUNCTIONS
+   ===================================================== */
 
-closeBtn.addEventListener('click', () => {
-    lightbox.style.display = 'none';
-});
+document.addEventListener("DOMContentLoaded", function () {
 
-lightbox.addEventListener('click', (e) => {
-    if (e.target === lightbox) {
-        lightbox.style.display = 'none';
+
+    /* ===== PROFESSIONAL BKDA GALLERY ===== */
+
+    const professionalGalleryImages = [
+        "karate1.jpg.jpeg",
+        "karate2.jpg",
+        "karate3.jpg",
+        "karate4.jpg",
+        "karate5.jpg",
+        "karate6.jpg",
+        "karate7.jpg"
+    ];
+
+    let currentGalleryIndex = 0;
+
+    const galleryMainImage =
+        document.getElementById("galleryMainImage");
+
+    const galleryThumbs =
+        document.querySelectorAll(".gallery-thumb");
+
+    const galleryPrev =
+        document.getElementById("galleryPrev");
+
+    const galleryNext =
+        document.getElementById("galleryNext");
+
+
+    /* ===== SHOW GALLERY IMAGE ===== */
+
+    function showGalleryImage(index) {
+
+        if (!galleryMainImage) return;
+
+        currentGalleryIndex =
+            (index + professionalGalleryImages.length) %
+            professionalGalleryImages.length;
+
+        galleryMainImage.style.opacity = "0";
+
+        setTimeout(function () {
+
+            galleryMainImage.src =
+                professionalGalleryImages[currentGalleryIndex];
+
+            galleryMainImage.style.opacity = "1";
+
+        }, 150);
+
+
+        galleryThumbs.forEach(function (thumb, i) {
+
+            thumb.classList.toggle(
+                "active",
+                i === currentGalleryIndex
+            );
+
+        });
+
     }
-});
-/* ===== PROFESSIONAL BKDA GALLERY ===== */
 
-const galleryImages = [
-    "karate1.jpg.jpeg",
-    "karate2.jpg",
-    "karate3.jpg",
-    "karate4.jpg",
-    "karate5.jpg",
-    "karate6.jpg",
-    "karate7.jpg"
-];
 
-let currentGalleryIndex = 0;
+    /* ===== NEXT BUTTON ===== */
 
-const galleryMainImage = document.getElementById("galleryMainImage");
-const galleryThumbs = document.querySelectorAll(".gallery-thumb");
-const galleryPrev = document.getElementById("galleryPrev");
-const galleryNext = document.getElementById("galleryNext");
+    if (galleryNext) {
 
-function showGalleryImage(index) {
+        galleryNext.addEventListener("click", function () {
 
-    if (!galleryMainImage) return;
+            showGalleryImage(
+                currentGalleryIndex + 1
+            );
 
-    currentGalleryIndex =
-        (index + galleryImages.length) % galleryImages.length;
+        });
 
-    galleryMainImage.style.opacity = "0";
+    }
 
-    setTimeout(() => {
-        galleryMainImage.src = galleryImages[currentGalleryIndex];
-        galleryMainImage.style.opacity = "1";
-    }, 150);
 
-    galleryThumbs.forEach((thumb, i) => {
-        thumb.classList.toggle(
-            "active",
-            i === currentGalleryIndex
-        );
+    /* ===== PREVIOUS BUTTON ===== */
+
+    if (galleryPrev) {
+
+        galleryPrev.addEventListener("click", function () {
+
+            showGalleryImage(
+                currentGalleryIndex - 1
+            );
+
+        });
+
+    }
+
+
+    /* ===== THUMBNAIL CLICK ===== */
+
+    galleryThumbs.forEach(function (thumb, index) {
+
+        thumb.addEventListener("click", function () {
+
+            showGalleryImage(index);
+
+        });
+
     });
-}
 
-/* Next */
-if (galleryNext) {
-    galleryNext.addEventListener("click", () => {
-        showGalleryImage(currentGalleryIndex + 1);
-    });
-}
 
-/* Previous */
-if (galleryPrev) {
-    galleryPrev.addEventListener("click", () => {
-        showGalleryImage(currentGalleryIndex - 1);
-    });
-}
+    /* =================================================
+       GALLERY LIGHTBOX
+       ================================================= */
 
-/* Thumbnail click */
-galleryThumbs.forEach((thumb, index) => {
-    thumb.addEventListener("click", () => {
-        showGalleryImage(index);
+    const lightbox =
+        document.getElementById("lightbox");
+
+    const lightboxImg =
+        document.getElementById("lightbox-img");
+
+    const closeBtn =
+        document.querySelector(".close");
+
+
+    /* Main gallery image opens lightbox */
+
+    if (galleryMainImage && lightbox && lightboxImg) {
+
+        galleryMainImage.addEventListener("click", function () {
+
+            lightbox.style.display = "flex";
+
+            lightboxImg.src =
+                galleryMainImage.src;
+
+        });
+
+    }
+
+
+    /* Thumbnail opens lightbox */
+
+    galleryThumbs.forEach(function (thumb) {
+
+        thumb.addEventListener("dblclick", function () {
+
+            if (!lightbox || !lightboxImg) return;
+
+            lightbox.style.display = "flex";
+
+            lightboxImg.src = thumb.src;
+
+        });
+
     });
+
+
+    /* Close button */
+
+    if (closeBtn && lightbox) {
+
+        closeBtn.addEventListener("click", function () {
+
+            lightbox.style.display = "none";
+
+        });
+
+    }
+
+
+    /* Click outside image closes lightbox */
+
+    if (lightbox) {
+
+        lightbox.addEventListener("click", function (e) {
+
+            if (e.target === lightbox) {
+
+                lightbox.style.display = "none";
+
+            }
+
+        });
+
+    }
+
 });
