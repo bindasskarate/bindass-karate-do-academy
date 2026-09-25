@@ -37,3 +37,64 @@ lightbox.addEventListener('click', (e) => {
         lightbox.style.display = 'none';
     }
 });
+/* ===== PROFESSIONAL BKDA GALLERY ===== */
+
+const galleryImages = [
+    "karate1.jpg.jpeg",
+    "karate2.jpg",
+    "karate3.jpg",
+    "karate4.jpg",
+    "karate5.jpg",
+    "karate6.jpg",
+    "karate7.jpg"
+];
+
+let currentGalleryIndex = 0;
+
+const galleryMainImage = document.getElementById("galleryMainImage");
+const galleryThumbs = document.querySelectorAll(".gallery-thumb");
+const galleryPrev = document.getElementById("galleryPrev");
+const galleryNext = document.getElementById("galleryNext");
+
+function showGalleryImage(index) {
+
+    if (!galleryMainImage) return;
+
+    currentGalleryIndex =
+        (index + galleryImages.length) % galleryImages.length;
+
+    galleryMainImage.style.opacity = "0";
+
+    setTimeout(() => {
+        galleryMainImage.src = galleryImages[currentGalleryIndex];
+        galleryMainImage.style.opacity = "1";
+    }, 150);
+
+    galleryThumbs.forEach((thumb, i) => {
+        thumb.classList.toggle(
+            "active",
+            i === currentGalleryIndex
+        );
+    });
+}
+
+/* Next */
+if (galleryNext) {
+    galleryNext.addEventListener("click", () => {
+        showGalleryImage(currentGalleryIndex + 1);
+    });
+}
+
+/* Previous */
+if (galleryPrev) {
+    galleryPrev.addEventListener("click", () => {
+        showGalleryImage(currentGalleryIndex - 1);
+    });
+}
+
+/* Thumbnail click */
+galleryThumbs.forEach((thumb, index) => {
+    thumb.addEventListener("click", () => {
+        showGalleryImage(index);
+    });
+});
