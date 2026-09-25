@@ -870,3 +870,233 @@ section.hero {
     color: #cccccc;
     margin-top: 8px;
 }
+/* =====================================================
+   BKDA PROFESSIONAL ANIMATION & VISUAL ENHANCEMENT
+   ===================================================== */
+
+/* Smooth page movement */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Hero image animation */
+.hero-image img {
+    transition: transform 0.6s ease, box-shadow 0.6s ease;
+}
+
+.hero-image img:hover {
+    transform: scale(1.02);
+    box-shadow: 0 15px 40px rgba(255, 0, 0, 0.25);
+}
+
+/* Hero content entrance */
+.hero-content {
+    animation: heroFadeUp 1s ease-out;
+}
+
+@keyframes heroFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(35px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Logo entrance */
+.hero-content .hero-logo {
+    animation: logoAppear 1s ease-out;
+}
+
+@keyframes logoAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.7);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Navigation hover animation */
+.nav-menu a {
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.nav-menu a::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -6px;
+    width: 0;
+    height: 2px;
+    background: white;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.nav-menu a:hover {
+    color: #ffdddd;
+}
+
+.nav-menu a:hover::after {
+    width: 70%;
+}
+
+/* Professional button animation */
+.join-btn,
+.download-app-btn,
+.map-btn,
+button {
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease,
+        background-color 0.3s ease;
+}
+
+.join-btn:hover,
+.download-app-btn:hover,
+.map-btn:hover,
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 22px rgba(255, 0, 0, 0.35);
+}
+
+/* Class cards */
+.class-card {
+    transition:
+        transform 0.35s ease,
+        box-shadow 0.35s ease,
+        border-color 0.35s ease;
+}
+
+.class-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(255, 0, 0, 0.2);
+    border-left-color: #ff3333;
+}
+
+/* Team cards */
+.team-card {
+    transition:
+        transform 0.35s ease,
+        box-shadow 0.35s ease;
+}
+
+.team-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(255, 0, 0, 0.25);
+}
+
+/* Team photos */
+.team-card img {
+    transition:
+        transform 0.4s ease,
+        box-shadow 0.4s ease;
+}
+
+.team-card:hover img {
+    transform: scale(1.06);
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+}
+
+/* Gallery animation */
+.gallery-container a {
+    overflow: hidden;
+    border-radius: 12px;
+    display: block;
+}
+
+.gallery-container a img {
+    transition:
+        transform 0.5s ease,
+        filter 0.5s ease;
+}
+
+.gallery-container a:hover img {
+    transform: scale(1.08);
+    filter: brightness(1.1);
+}
+
+/* Statistics animation */
+.stat {
+    transition:
+        transform 0.35s ease,
+        opacity 0.35s ease;
+}
+
+.stat:hover {
+    transform: translateY(-8px);
+}
+
+.stat h2 {
+    transition: transform 0.3s ease;
+}
+
+.stat:hover h2 {
+    transform: scale(1.08);
+}
+
+/* Contact section */
+.contact iframe {
+    transition:
+        transform 0.4s ease,
+        box-shadow 0.4s ease;
+}
+
+.contact iframe:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(255, 0, 0, 0.18);
+}
+
+/* Footer links */
+footer a {
+    transition:
+        color 0.3s ease,
+        transform 0.3s ease;
+}
+
+footer a:hover {
+    transform: translateY(-2px);
+}
+
+/* Mobile menu animation */
+.nav-menu {
+    transition:
+        opacity 0.3s ease,
+        transform 0.3s ease;
+}
+
+.nav-menu.open {
+    animation: menuOpen 0.3s ease;
+}
+
+@keyframes menuOpen {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
