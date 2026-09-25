@@ -1281,18 +1281,9 @@ async function saveNotice() {
 
 
     } catch (error) {
-
-        console.error(
-            "Notice error:",
-            error
-        );
-
-        alert(
-            "Unable to publish notice."
-        );
-
-    }
-
+    console.error("Notice error:", error);
+    alert("Notice error: " + error.message);
+}
 }
 
 
