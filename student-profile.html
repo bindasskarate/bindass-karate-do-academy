@@ -404,57 +404,86 @@ function percent(present,total) {
 
 onAuthStateChanged(auth, async user => {
 
-    if (!user) {
-        location.replace("login.html");
-        return;
-    }
+    try {
 
-    const role =
-        localStorage.getItem("bkdLoginRole");
+        if (!user) {
+            location.replace("login.html");
+            return;
+        }
 
-    studentMode = role === "student";
+        const role = localStorage.getItem("bkdLoginRole");
 
-    if (studentMode) {
+        studentMode = role === "student";
 
-        $("backToStudentsBtn").style.display = "none";
+        if (studentMode) {
 
-        const snap =
-            await getDocs(
+            $("backToStudentsBtn").style.display = "none";
+
+            const snap = await getDocs(
                 collection(db, "students")
             );
 
-        snap.forEach(d => {
+            snap.forEach(d => {
 
-            const s = d.data();
+                const s = d.data();
 
-            if (s.loginUid === user.uid) {
-                studentId = d.id;
-                studentData = s;
+                if (s.loginUid === user.uid) {
+                    studentId = d.id;
+                    studentData = s;
+                }
+
+            });
+
+        } else {
+
+            const params = new URLSearchParams(location.search);
+
+            studentId =
+                params.get("id") ||
+                params.get("studentId") ||
+                localStorage.getItem("selectedStudentId");
+
+            if (!studentId) {
+
+                $("profileContent").innerHTML = `
+                    <div class="card"
+                         style="padding:25px;text-align:center">
+
+                        <h2>Student ID not found</h2>
+
+                        <p style="color:#6b7280;margin-top:8px">
+                            Please open a student profile from
+                            the Students page.
+                        </p>
+
+                    </div>
+                `;
+
+                return;
             }
+        }
 
-        });
+        if (!studentData && studentId) {
 
-    } else {
+            const snap = await getDoc(
+                doc(db, "students", studentId)
+            );
 
-        const params =
-            new URLSearchParams(location.search);
+            if (snap.exists()) {
+                studentData = snap.data();
+            }
+        }
 
-        studentId =
-            params.get("id") ||
-            params.get("studentId") ||
-            localStorage.getItem("selectedStudentId");
-
-        if (!studentId) {
+        if (!studentData) {
 
             $("profileContent").innerHTML = `
                 <div class="card"
                      style="padding:25px;text-align:center">
 
-                    <h2>Student ID not found</h2>
+                    <h2>Student profile not found</h2>
 
                     <p style="color:#6b7280;margin-top:8px">
-                        Please open a student profile from
-                        the Students page.
+                        No student record was found.
                     </p>
 
                 </div>
@@ -462,89 +491,32 @@ onAuthStateChanged(auth, async user => {
 
             return;
         }
-    }
 
-    if (!studentData && studentId) {
-
-        const snap =
-            await getDoc(
-                doc(db, "students", studentId)
-            );
-
-        if (snap.exists()) {
-            studentData = snap.data();
+        if (!studentMode) {
+            $("changePasswordSection").style.display = "block";
         }
-    }
 
-    if (!studentData) {
+        await loadStudentProfile();
+
+    } catch (error) {
+
+        console.error("Student profile loading error:", error);
 
         $("profileContent").innerHTML = `
             <div class="card"
                  style="padding:25px;text-align:center">
 
-                <h2>Student profile not found</h2>
+                <h2>Unable to load profile</h2>
 
-                <p style="color:#6b7280;margin-top:8px">
-                    No student record was found.
+                <p style="color:#dc2626;margin-top:10px">
+                    ${error.message}
                 </p>
 
             </div>
         `;
-
-        return;
     }
 
-    if (!studentMode) {
-        $("changePasswordSection").style.display =
-            "block";
-    }
-
-    await loadStudentProfile();
 });
-
-     
-
-        const params = new URLSearchParams(location.search);
-
-studentId =
-    params.get("id") ||
-    params.get("studentId") ||
-    params.get("student") ||
-    localStorage.getItem("selectedStudentId");
-
-if (!studentId || studentId === "1") {
-    $("profileContent").innerHTML =
-        "<div class='card' style='padding:25px;text-align:center'>" +
-        "<h2>Student Profile Not Found</h2>" +
-        "<p style='color:#6b7280;margin-top:8px'>" +
-        "Please open the profile from the Students page." +
-        "</p></div>";
-
-    return;
-}
-
-    if (!studentData && studentId) {
-        const snap = await getDoc(
-            doc(db,"students",studentId)
-        );
-
-        if (snap.exists()) {
-            studentData = snap.data();
-        }
-    }
-
-    if (!studentData) {
-        $("profileContent").innerHTML =
-            "<div class='card'>Student profile not found.</div>";
-        return;
-    }
-
-    if (!studentMode) {
-        $("changePasswordSection").style.display = "block";
-    }
-
-    await loadStudentProfile();
-;
 
 
 async function loadStudentProfile() {
