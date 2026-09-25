@@ -891,7 +891,33 @@
                     </p>
 
                 </section>
+<!-- MANAGE NOTICES -->
 
+<section class="section">
+
+    <div class="section-header">
+
+        <div>
+            <h2>📢 Manage Notices</h2>
+
+            <p>
+                Published academy notices
+            </p>
+        </div>
+
+    </div>
+
+    <div id="adminNotices">
+        <p style="
+            color:#777;
+            text-align:center;
+            padding:20px 5px;
+        ">
+            Loading notices...
+        </p>
+    </div>
+
+</section>
 
                 <!-- ADMIN CONTROL -->
 
@@ -1033,6 +1059,7 @@
         import {
     getFirestore,
     collection,
+    doc,
     onSnapshot,
     addDoc,
     deleteDoc,
@@ -1331,7 +1358,166 @@ async function deleteNotice(noticeId) {
 }
 
 window.deleteNotice = deleteNotice;
+loadAdminNotices();
 
+/* =========================
+   MANAGE NOTICES
+========================= */
+function escapeHTML(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+function loadAdminNotices() {
+
+    onSnapshot(
+        collection(db, "notifications"),
+        (snapshot) => {
+
+            const container =
+                document.getElementById(
+                    "adminNotices"
+                );
+
+            if (snapshot.empty) {
+
+                container.innerHTML = `
+                    <p style="
+                        color:#777;
+                        text-align:center;
+                        padding:20px 5px;
+                    ">
+                        No notices published yet.
+                    </p>
+                `;
+
+                document.getElementById(
+                    "notifications"
+                ).textContent = "0";
+
+                return;
+            }
+
+
+            const notices = [];
+
+            snapshot.forEach((noticeDoc) => {
+
+                const notice =
+                    noticeDoc.data();
+
+                notices.push({
+                    id: noticeDoc.id,
+                    ...notice
+                });
+
+            });
+
+
+            notices.sort((a, b) =>
+                String(
+                    b.date || ""
+                ).localeCompare(
+                    String(
+                        a.date || ""
+                    )
+                )
+            );
+
+
+            container.innerHTML =
+                notices.map(
+                    (notice) => `
+
+                    <div style="
+                        background:#111;
+                        border:1px solid #292929;
+                        border-radius:12px;
+                        padding:15px;
+                        margin-bottom:12px;
+                    ">
+
+                        <div style="
+                            display:flex;
+                            justify-content:space-between;
+                            align-items:flex-start;
+                            gap:12px;
+                        ">
+
+                            <div style="flex:1;">
+
+                                <h3 style="
+                                    font-size:14px;
+                                    margin-bottom:6px;
+                                ">
+                                    ${escapeHTML(
+                                        notice.title ||
+                                        "Notice"
+                                    )}
+                                </h3>
+
+                                <p style="
+                                    color:#aaa;
+                                    font-size:12px;
+                                    line-height:1.6;
+                                ">
+                                    ${escapeHTML(
+                                        notice.message ||
+                                        ""
+                                    )}
+                                </p>
+
+                                <small style="
+                                    display:block;
+                                    color:#666;
+                                    margin-top:8px;
+                                ">
+                                    ${escapeHTML(
+                                        notice.date ||
+                                        ""
+                                    )}
+                                </small>
+
+                            </div>
+
+                            <button
+                                onclick="deleteNotice('${notice.id}')"
+                                style="
+                                    border:1px solid #5b1717;
+                                    background:#241010;
+                                    color:#ff6b6b;
+                                    padding:8px 11px;
+                                    border-radius:8px;
+                                    cursor:pointer;
+                                    font-size:12px;
+                                    white-space:nowrap;
+                                "
+                            >
+                                🗑️ Delete
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                `
+                ).join("");
+
+
+            document.getElementById(
+                "notifications"
+            ).textContent =
+                notices.length;
+
+        }
+    );
+
+}
     </script>
 
 </body>
