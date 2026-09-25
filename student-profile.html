@@ -1,700 +1,79 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Student Portal | BKD</title>
+window.openPaymentReference=(paymentId)=>{
 
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{
-font-family:Arial,sans-serif;
-background:#f4f6f9;color:#111827;
-}
-button,input{font-family:inherit}
-.top{
-background:linear-gradient(135deg,#080808,#1b1b1b);
-color:#fff;padding:16px 5%;
-display:flex;align-items:center;
-justify-content:space-between;
-position:sticky;top:0;z-index:20;
-}
-.brand{display:flex;align-items:center;gap:10px}
-.logo{width:42px;height:42px;border-radius:50%;object-fit:contain;background:#fff}
-.brand b{font-size:15px}
-.brand small{display:block;color:#aaa;margin-top:3px}
-.logout{
-border:0;background:#ffffff12;color:#fff;
-padding:9px 13px;border-radius:10px;cursor:pointer
-}
-.container{width:min(1100px,92%);margin:25px auto 60px}
-.welcome{margin-bottom:18px}
-.welcome h1{font-size:27px}
-.welcome p{color:#777;margin-top:5px;font-size:13px}
+lastPaymentId=paymentId;
 
-.hero{
-background:linear-gradient(135deg,#111827,#252525);
-color:#fff;border-radius:24px;padding:25px;
-display:flex;align-items:center;justify-content:space-between;
-gap:20px;box-shadow:0 12px 35px #0002;
-animation:up .5s ease;
-}
-.hero-left{display:flex;align-items:center;gap:16px}
-.avatar{
-width:70px;height:70px;border-radius:20px;
-background:#ffffff14;display:flex;
-align-items:center;justify-content:center;font-size:30px
-}
-.hero h2{font-size:27px}
-.id{color:#aaa;font-size:12px;margin-top:5px}
-.badges{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
-.badge{
-padding:6px 10px;border-radius:20px;
-background:#ffffff12;font-size:11px
-}
-.active{background:#14532d;color:#86efac}
+document
+.getElementById("transactionReference")
+.value="";
 
-.section-title{
-font-size:18px;font-weight:800;margin:27px 0 13px
-}
+document
+.getElementById("referenceMessage")
+.textContent="";
 
-.actions{
-display:grid;grid-template-columns:repeat(4,1fr);gap:12px
-}
-.action{
-background:#fff;border:1px solid #e5e7eb;
-border-radius:17px;padding:17px;cursor:pointer;
-box-shadow:0 4px 15px #00000008;
-transition:.2s;
-}
-.action:hover{transform:translateY(-3px);box-shadow:0 10px 25px #0001}
-.action:active{transform:scale(.97)}
-.action-icon{font-size:22px;margin-bottom:10px}
-.action b{font-size:13px}
-.action small{display:block;color:#777;margin-top:4px}
+document
+.getElementById("paymentReferenceModal")
+.classList.add("show");
 
-@keyframes up{
-from{opacity:0;transform:translateY(15px)}
-to{opacity:1;transform:none}
-}
-
-@media(max-width:700px){
-.container{width:94%}
-.hero{padding:20px}
-.hero h2{font-size:22px}
-.hero-right{display:none}
-.actions{grid-template-columns:repeat(2,1fr)}
-}
-</style>
-</head>
-<body>
-
-<div class="top">
-<div class="brand">
-<img src="images/bindasslogo.jpeg" class="logo">
-<div>
-<b>Bindass Karate Do Academy</b>
-<small>Student Portal</small>
-</div>
-</div>
-
-<button class="logout" id="logoutBtn">🚪 Logout</button>
-</div>
-
-<main class="container">
-
-<div class="welcome">
-<h1>Welcome back 👋</h1>
-<p>Your training, attendance and academy records</p>
-</div>
-
-<button id="backToStudentsBtn"
-style="display:none;margin-bottom:15px"
-class="logout">
-← Back to Students
-</button>
-
-<div id="profile">
-<div style="text-align:center;padding:50px;color:#777">
-Loading student profile...
-</div>
-</div>
-
-</main>
-<div id="securityModal" class="modal">
-<div class="modal-box">
-<div class="modal-head">
-<div>
-<h3>🔐 Account Security</h3>
-<small>Change your password</small>
-</div>
-<button onclick="closeSecurity()">✕</button>
-</div>
-
-<label>Current Password</label>
-<input type="password" id="currentPassword">
-
-<label>New Password</label>
-<input type="password" id="newPassword">
-
-<label>Confirm Password</label>
-<input type="password" id="confirmPassword">
-
-<button class="main-btn" id="changePasswordBtn">
-🔐 Change Password
-</button>
-
-<p id="passwordMessage"></p>
-</div>
-</div>
-
-<style>
-.modal{
-position:fixed;inset:0;background:#0009;
-display:none;align-items:center;justify-content:center;
-padding:18px;z-index:100;
-}
-.modal.show{display:flex}
-.modal-box{
-background:#fff;width:min(430px,100%);
-padding:23px;border-radius:22px;
-animation:up .3s ease;
-}
-.modal-head{
-display:flex;justify-content:space-between;
-margin-bottom:20px;
-}
-.modal-head button{
-border:0;background:#eee;border-radius:9px;
-width:34px;height:34px;cursor:pointer;
-}
-.modal-box label{
-display:block;font-size:12px;font-weight:bold;
-margin:13px 0 6px;
-}
-.modal-box input{
-width:100%;padding:12px;border:1px solid #ddd;
-border-radius:10px;outline:none;
-}
-.main-btn{
-width:100%;border:0;background:#dc2626;
-color:#fff;padding:13px;border-radius:11px;
-font-weight:bold;margin-top:18px;cursor:pointer;
-}
-#passwordMessage{font-size:12px;margin-top:12px}
-</style>
-<script type="module">
-
-import {initializeApp}
-from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-
-import {
-getAuth,onAuthStateChanged,signOut,
-EmailAuthProvider,reauthenticateWithCredential,
-updatePassword
-} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-
-import {
-getFirestore,doc,getDoc,getDocs,collection,
-addDoc,updateDoc,serverTimestamp
-} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-
-const firebaseConfig={
-apiKey:"AIzaSyCDpKF59MATfa-JaGF9yOBvHyi8i__3CFc",
-authDomain:"bindass-karate-do-academy.firebaseapp.com",
-projectId:"bindass-karate-do-academy",
-storageBucket:"bindass-karate-do-academy.firebasestorage.app",
-messagingSenderId:"360953215088",
-appId:"1:360953215088:web:c4399bcd991abf98229cb5",
-measurementId:"G-FWLX780V9Q"
 };
 
-const app=initializeApp(firebaseConfig);
-const auth=getAuth(app);
-const db=getFirestore(app);
+window.closePaymentReference=()=>{
 
-const profile=document.getElementById("profile");
+document
+.getElementById("paymentReferenceModal")
+.classList.remove("show");
 
-const params=new URLSearchParams(location.search);
-const studentMode=params.get("student")==="1";
-let studentId=params.get("id");
+lastPaymentId=null;
 
-let currentStudent=null;
-let lastPaymentId=null;
-document.getElementById("logoutBtn").onclick=async()=>{
-await signOut(auth);
-localStorage.removeItem("bkdLoginRole");
-location.replace("login.html");
 };
 
-window.openSecurity=()=>{
-document.getElementById("securityModal").classList.add("show");
-};
+window.submitPaymentReference=async()=>{
 
-window.closeSecurity=()=>{
-document.getElementById("securityModal").classList.remove("show");
-};
+if(!lastPaymentId)return;
 
-document.getElementById("changePasswordBtn").onclick=async()=>{
-const user=auth.currentUser;
-const msg=document.getElementById("passwordMessage");
+const input=
+document.getElementById("transactionReference");
 
-const current=document.getElementById("currentPassword").value;
-const pass=document.getElementById("newPassword").value;
-const confirm=document.getElementById("confirmPassword").value;
+const msg=
+document.getElementById("referenceMessage");
 
-if(!current||!pass||!confirm){
-msg.textContent="Please fill all fields.";return;
-}
+const ref=input.value.trim();
 
-if(pass!==confirm){
-msg.textContent="Passwords do not match.";return;
-}
+if(!ref){
 
-if(pass.length<6){
-msg.textContent="Password must be at least 6 characters.";return;
-}
+msg.textContent="Please enter your transaction reference.";
 
-msg.textContent="Changing password...";
-
-try{
-const credential=EmailAuthProvider.credential(user.email,current);
-await reauthenticateWithCredential(user,credential);
-await updatePassword(user,pass);
-
-msg.textContent="✅ Password changed successfully.";
-
-document.getElementById("currentPassword").value="";
-document.getElementById("newPassword").value="";
-document.getElementById("confirmPassword").value="";
-}catch(e){
-console.error(e);
-msg.textContent="❌ Unable to change password.";
-}
-};
-async function loadStudentProfile(){
-
-const snap=await getDoc(doc(db,"students",studentId));
-
-if(!snap.exists()){
-profile.innerHTML=`<div class="portal-card">
-Student not found.
-</div>`;
 return;
-}
-
-const s=snap.data();
-currentStudent={id:studentId,name:s.name||"Student"};
-
-const monthlyFee=Number(s.monthlyFee)||0;
-
-let completedMonths=0;
-
-if(s.joiningDate&&monthlyFee){
-const join=new Date(s.joiningDate+"T00:00:00");
-const now=new Date();
-
-completedMonths=
-(now.getFullYear()-join.getFullYear())*12+
-(now.getMonth()-join.getMonth());
-
-if(now.getDate()<join.getDate())completedMonths--;
-if(completedMonths<0)completedMonths=0;
-}
-
-const totalMonthlyFees=completedMonths*monthlyFee;
-
-const payments=await getDocs(collection(db,"payments"));
-const fees=await getDocs(collection(db,"fees"));
-const attendance=await getDocs(collection(db,"attendance"));
-
-let paid=0,otherPending=0,otherPaid=0;
-let feeRecords=[];
-
-payments.forEach(d=>{
-const p=d.data();
-if(p.studentId===studentId&&p.status==="Paid"){
-paid+=Number(p.amount)||0;
-feeRecords.push({
-id:d.id,source:"payments",...p,
-amount:Number(p.amount)||0
-});
-}
-});
-
-fees.forEach(d=>{
-const f=d.data();
-if(f.studentId!==studentId)return;
-
-const amount=Number(f.amount)||0;
-
-feeRecords.push({
-id:d.id,source:"fees",...f,amount
-});
-
-if(f.status==="Paid")otherPaid+=amount;
-else otherPending+=amount;
-});
-
-const pendingMonthly=
-Math.max(0,totalMonthlyFees-paid);
-
-const pendingFee=pendingMonthly+otherPending;
-const totalPaid=paid+otherPaid;
-let totalDays=0,presentDays=0;
-let monthTotal=0,monthPresent=0;
-let monthlyData={};
-
-const currentMonth=new Date().toISOString().slice(0,7);
-
-attendance.forEach(d=>{
-const data=d.data();
-const status=data.records?.[studentId];
-if(!status)return;
-
-const date=d.id;
-totalDays++;
-
-if(status==="Present")presentDays++;
-
-if(date.startsWith(currentMonth)){
-monthTotal++;
-if(status==="Present")monthPresent++;
-}
-
-const month=date.slice(0,7);
-
-if(!monthlyData[month])
-monthlyData[month]={total:0,present:0};
-
-monthlyData[month].total++;
-
-if(status==="Present")
-monthlyData[month].present++;
-});
-
-const overall=totalDays?
-Math.round(presentDays/totalDays*100):0;
-
-const monthPercent=monthTotal?
-Math.round(monthPresent/monthTotal*100):0;
-
-let months="";
-
-Object.keys(monthlyData)
-.sort().reverse()
-.forEach(m=>{
-const x=monthlyData[m];
-const p=Math.round(x.present/x.total*100);
-
-months+=`
-<div class="month-row">
-<div class="month-top">
-<b>${m}</b>
-<span>${p}%</span>
-</div>
-<small>${x.present} Present / ${x.total} Days</small>
-<div class="month-progress">
-<div class="month-progress-bar" style="width:${p}%"></div>
-</div>
-</div>`;
-});
-profile.innerHTML=`
-
-<div class="hero">
-<div class="hero-left">
-<div class="avatar">🥋</div>
-<div>
-<div style="font-size:10px;color:#aaa">
-STUDENT PROFILE
-</div>
-
-<h2>${escapeHTML(s.name||"Unnamed Student")}</h2>
-
-<div class="id">Student ID: ${escapeHTML(studentId)}</div>
-
-<div class="badges">
-<span class="badge active">
-● ${escapeHTML(s.status||"Active")}
-</span>
-<span class="badge">
-🥋 ${escapeHTML(s.belt||"Belt not set")}
-</span>
-</div>
-</div>
-</div>
-</div>
-
-<div class="section-title">Quick Actions</div>
-
-<div class="actions">
-
-<div class="action" onclick="openPayment()">
-<div class="action-icon">💳</div>
-<b>Pay Fees</b>
-<small>Make a payment</small>
-</div>
-
-<div class="action" onclick="document.getElementById('feeSection').scrollIntoView({behavior:'smooth'})">
-<div class="action-icon">🧾</div>
-<b>Fee History</b>
-<small>View payments</small>
-</div>
-
-<div class="action">
-<div class="action-icon">🏆</div>
-<b>Achievements</b>
-<small>Training journey</small>
-</div>
-
-${studentMode?`
-<div class="action" onclick="openSecurity()">
-<div class="action-icon">🔐</div>
-<b>Security</b>
-<small>Change password</small>
-</div>`:""}
-
-</div>
-
-<div class="section-title">Attendance</div>
-
-<div class="attendance-grid">
-
-<div class="attendance-card">
-<span>THIS MONTH</span>
-<div class="attendance-value">${monthPercent}%</div>
-<div class="progress">
-<div class="progress-bar" style="width:${monthPercent}%"></div>
-</div>
-</div>
-
-<div class="attendance-card">
-<span>THIS YEAR</span>
-<div class="attendance-value">${overall}%</div>
-<div class="progress">
-<div class="progress-bar" style="width:${overall}%"></div>
-</div>
-</div>
-
-<div class="attendance-card">
-<span>OVERALL</span>
-<div class="attendance-value">${overall}%</div>
-<div class="progress">
-<div class="progress-bar" style="width:${overall}%"></div>
-</div>
-</div>
-
-</div>
-`;
-profile.innerHTML+=`
-
-<div class="section-title">Student Details</div>
-
-<div class="portal-card">
-<div class="details-grid">
-
-<div class="detail-item">
-<div class="detail-label">Date of Birth</div>
-<div class="detail-value">${escapeHTML(s.dob||"-")}</div>
-</div>
-
-<div class="detail-item">
-<div class="detail-label">Phone</div>
-<div class="detail-value">${escapeHTML(s.phone||"-")}</div>
-</div>
-
-<div class="detail-item">
-<div class="detail-label">Email</div>
-<div class="detail-value">${escapeHTML(s.email||"-")}</div>
-</div>
-
-<div class="detail-item">
-<div class="detail-label">Joining Date</div>
-<div class="detail-value">${escapeHTML(s.joiningDate||"-")}</div>
-</div>
-
-<div class="detail-item">
-<div class="detail-label">Belt</div>
-<div class="detail-value">${escapeHTML(s.belt||"-")}</div>
-</div>
-
-<div class="detail-item">
-<div class="detail-label">Status</div>
-<div class="detail-value">${escapeHTML(s.status||"-")}</div>
-</div>
-
-</div>
-</div>
-
-<div class="section-title">Monthly Attendance</div>
-
-<div class="portal-card">
-<div class="month-list">
-${months||`<div class="placeholder">
-No attendance records available.
-</div>`}
-</div>
-</div>
-
-<div class="section-title">Fees & Payment</div>
-
-<div class="portal-card" id="feeSection">
-
-<div class="fee-summary">
-
-<div class="fee-main">
-<div class="fee-main-label">Pending Fee</div>
-<div class="fee-main-value">₹${pendingFee}</div>
-<div class="fee-main-status">
-${pendingFee>0?"Payment Pending":"All Paid"}
-</div>
-</div>
-
-<div class="fee-stat">
-<div class="fee-stat-label">Monthly Fee</div>
-<div class="fee-stat-value">₹${monthlyFee}</div>
-</div>
-
-<div class="fee-stat">
-<div class="fee-stat-label">Total Paid</div>
-<div class="fee-stat-value">₹${totalPaid}</div>
-</div>
-
-<div class="fee-stat">
-<div class="fee-stat-label">Other Pending</div>
-<div class="fee-stat-value">₹${otherPending}</div>
-</div>
-
-</div>
-
-<div style="margin-top:18px">
-<button class="pay-btn" onclick="openPayment()">
-💳 Pay Fees
-</button>
-</div>
-
-</div>
-`;
 
 }
 
-function escapeHTML(v){
-return String(v)
-.replaceAll("&","&amp;")
-.replaceAll("<","&lt;")
-.replaceAll(">","&gt;")
-.replaceAll('"',"&quot;")
-.replaceAll("'","&#039;");
-}
-onAuthStateChanged(auth,async user=>{
-
-if(!user){
-location.href="login.html";
-return;
-}
+msg.textContent="Submitting...";
 
 try{
 
-const back=document.getElementById("backToStudentsBtn");
-
-if(studentMode){
-if(back)back.style.display="none";
-
-const students=await getDocs(collection(db,"students"));
-
-let found=null;
-
-students.forEach(d=>{
-const data=d.data();
-
-if(data.loginUid===user.uid){
-found={id:d.id,...data};
+await updateDoc(
+doc(db,"payments",lastPaymentId),
+{
+transactionRef:ref,
+submittedAt:serverTimestamp(),
+status:"Pending Verification"
 }
-});
-
-if(!found){
-profile.innerHTML=`
-<div class="portal-card">
-Student profile not found.
-</div>`;
-return;
-}
-
-studentId=found.id;
-
-}else{
-
-if(!studentId){
-profile.innerHTML=`
-<div class="portal-card">
-Student ID not found.
-</div>`;
-return;
-}
-
-if(back){
-back.style.display="inline-block";
-back.onclick=()=>history.back();
-}
-}
-
-await loadStudentProfile();
-
-}catch(e){
-
-console.error(e);
-
-profile.innerHTML=`
-<div class="portal-card">
-Unable to load student profile.
-</div>`;
-}
-
-});
-
-window.openPayment=()=>{
-
-if(!studentId)return;
-
-const name=currentStudent?.name||"Student";
-
-const amount=prompt(
-"Enter payment amount:",
-""
 );
 
-if(!amount||Number(amount)<=0)return;
+msg.textContent=
+"✅ Reference submitted successfully.";
 
-const upi=
-`upi://pay?pa=bindasskarate786@okhdfcbank`+
-`&pn=Bindass%20Karate%20Do%20Academy`+
-`&am=${encodeURIComponent(amount)}`+
-`&cu=INR`+
-`&tn=${encodeURIComponent("BKD Fees - "+name)}`;
+setTimeout(()=>{
+closePaymentReference();
+loadStudentProfile();
+},1000);
 
-addDoc(collection(db,"payments"),{
-studentId,
-studentName:name,
-amount:Number(amount),
-upiId:"bindasskarate786@okhdfcbank",
-status:"Pending",
-transactionRef:"",
-paymentDate:null,
-createdAt:serverTimestamp()
-}).then(d=>{
+}catch(error){
 
-localStorage.setItem("bkd_pending_payment",d.id);
+console.error(error);
 
-location.assign(upi);
+msg.textContent=
+"❌ Unable to submit reference.";
 
-}).catch(e=>{
-console.error(e);
-alert("Unable to create payment request.");
-});
+}
 
 };
-
-</script>
-
-</body>
-</html>
