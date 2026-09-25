@@ -1,102 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>BKD Admin Dashboard</title>
+    <title>BKD Admin Panel</title>
 
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        :root {
+            --red: #e50914;
+            --red-dark: #b8000b;
+            --black: #080808;
+            --dark: #111;
+            --card: #151515;
+            --border: #292929;
+            --text: #ffffff;
+            --muted: #9b9b9b;
         }
 
         body {
-            background: #f4f5f7;
-            color: #222;
+            background: #080808;
+            color: var(--text);
+            min-height: 100vh;
         }
 
         /* SIDEBAR */
+
         .sidebar {
             position: fixed;
             left: 0;
             top: 0;
-            width: 250px;
+            width: 255px;
             height: 100vh;
-            background: #111;
-            color: white;
-            padding: 25px 15px;
+            background: linear-gradient(180deg, #090909, #111);
+            border-right: 1px solid #252525;
+            padding: 22px 15px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
         }
 
-        .logo {
+        .brand {
+            padding: 5px 10px 25px;
+            border-bottom: 1px solid #252525;
+            margin-bottom: 18px;
             text-align: center;
-            margin-bottom: 35px;
         }
 
-        .logo img {
-            width: 75px;
-            height: 75px;
-            object-fit: contain;
+        .brand img {
+            width: 72px;
+            height: 72px;
             border-radius: 50%;
+            object-fit: contain;
             margin-bottom: 10px;
         }
 
-        .logo h2 {
-            font-size: 18px;
+        .brand h2 {
+            font-size: 17px;
+            letter-spacing: .5px;
         }
 
-        .logo p {
-            font-size: 12px;
-            color: #aaa;
+        .brand p {
+            color: #888;
+            font-size: 11px;
             margin-top: 5px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
         }
 
         .menu {
             list-style: none;
+            flex: 1;
         }
 
         .menu li {
-            margin: 8px 0;
+            margin-bottom: 6px;
         }
 
         .menu button {
             width: 100%;
-            padding: 13px;
             border: none;
             background: transparent;
-            color: #ddd;
+            color: #cfcfcf;
+            padding: 13px 14px;
+            border-radius: 10px;
             text-align: left;
-            border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
+            transition: .2s ease;
         }
 
         .menu button:hover {
-            background: #292929;
+            background: #1d1d1d;
             color: white;
+            transform: translateX(2px);
+        }
+
+        .menu li:first-child button {
+            background: linear-gradient(135deg, var(--red), #a90009);
+            color: white;
+            box-shadow: 0 7px 20px rgba(229, 9, 20, .25);
         }
 
         .logout {
-            position: absolute;
-            bottom: 25px;
-            left: 15px;
-            width: calc(100% - 30px);
+            width: 100%;
+            border: 1px solid #4b1717;
+            background: #1a0d0d;
+            color: #ff6b6b;
             padding: 12px;
-            border: none;
-            border-radius: 8px;
-            background: #b00000;
-            color: white;
+            border-radius: 10px;
             cursor: pointer;
+            font-size: 14px;
+            transition: .2s ease;
+        }
+
+        .logout:hover {
+            background: #c4000a;
+            color: white;
         }
 
         /* MAIN */
+
         .main {
-            margin-left: 250px;
-            padding: 30px;
+            margin-left: 255px;
+            min-height: 100vh;
+            padding: 28px 32px;
+            background:
+                radial-gradient(circle at 85% 10%, rgba(229, 9, 20, .08), transparent 25%),
+                #090909;
         }
+
+        /* TOPBAR */
 
         .topbar {
             display: flex;
@@ -105,137 +147,329 @@
             margin-bottom: 30px;
         }
 
-        .topbar h1 {
-            font-size: 28px;
+        .welcome small {
+            color: #888;
+            font-size: 13px;
         }
 
-        .admin-name {
-            background: white;
-            padding: 10px 18px;
-            border-radius: 20px;
-            box-shadow: 0 2px 10px #ddd;
-            font-size: 14px;
+        .welcome h1 {
+            font-size: 30px;
+            margin-top: 6px;
         }
 
-        /* CARDS */
+        .welcome h1 span {
+            color: var(--red);
+        }
+
+        .welcome p {
+            color: #888;
+            margin-top: 7px;
+            font-size: 13px;
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #141414;
+            border: 1px solid #292929;
+            padding: 8px 14px 8px 8px;
+            border-radius: 40px;
+        }
+
+        .admin-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--red), #730008);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .admin-profile strong {
+            font-size: 13px;
+        }
+
+        .admin-profile small {
+            display: block;
+            color: #777;
+            margin-top: 2px;
+            font-size: 10px;
+        }
+
+        /* STAT CARDS */
+
         .cards {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 16px;
+            margin-bottom: 22px;
         }
 
         .card {
-            background: white;
-            padding: 22px;
-            border-radius: 14px;
-            box-shadow: 0 3px 15px #ddd;
+            background: linear-gradient(145deg, #171717, #101010);
+            border: 1px solid #292929;
+            border-radius: 16px;
+            padding: 20px;
+            min-height: 135px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::after {
+            content: "";
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(229, 9, 20, .08);
+            right: -25px;
+            bottom: -25px;
+        }
+
+        .card-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: #241010;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 18px;
         }
 
         .card p {
-            color: #777;
-            font-size: 13px;
+            color: #888;
+            font-size: 12px;
         }
 
         .card h2 {
-            margin-top: 10px;
-            font-size: 30px;
+            font-size: 28px;
+            margin-top: 6px;
         }
 
-        /* SECTIONS */
+        /* CONTENT GRID */
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 18px;
+        }
+
         .section {
-            background: white;
-            padding: 25px;
-            border-radius: 14px;
-            box-shadow: 0 3px 15px #ddd;
-            margin-bottom: 25px;
+            background: linear-gradient(145deg, #151515, #101010);
+            border: 1px solid #292929;
+            border-radius: 16px;
+            padding: 22px;
+            margin-bottom: 18px;
         }
 
-        .section h2 {
-            margin-bottom: 8px;
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
         }
 
-        .section p {
+        .section-header h2 {
+            font-size: 18px;
+        }
+
+        .section-header p {
             color: #777;
-            margin-bottom: 20px;
+            font-size: 12px;
+            margin-top: 5px;
         }
+
+        .view-all {
+            color: var(--red);
+            font-size: 12px;
+        }
+
+        /* QUICK ACTIONS */
 
         .actions {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
         }
 
         .action {
-            padding: 20px;
-            border: 1px solid #eee;
-            border-radius: 10px;
-            background: #fafafa;
+            border: 1px solid #292929;
+            background: #111;
+            border-radius: 13px;
+            padding: 17px;
             cursor: pointer;
-            text-align: left;
+            transition: .2s ease;
         }
 
         .action:hover {
-            background: #eee;
+            border-color: var(--red);
+            transform: translateY(-2px);
+            background: #171010;
+        }
+
+        .action-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 11px;
+            background: #241010;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            font-size: 18px;
         }
 
         .action h3 {
-            margin-bottom: 7px;
+            font-size: 14px;
+            margin-bottom: 5px;
         }
 
         .action p {
-            font-size: 13px;
-            margin: 0;
+            color: #777;
+            font-size: 11px;
+            line-height: 1.5;
         }
 
-        /* MOBILE */
-        @media (max-width: 900px) {
+        /* ACADEMY BANNER */
 
-            .sidebar {
-                width: 200px;
-            }
+        .academy-banner {
+            position: relative;
+            min-height: 185px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #292929;
+            background:
+                linear-gradient(90deg, rgba(0, 0, 0, .95), rgba(0, 0, 0, .45)),
+                url("images/karatehomepage.jpeg") center/cover;
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
 
-            .main {
-                margin-left: 200px;
-            }
+        .academy-banner h2 {
+            font-size: 25px;
+            line-height: 1.15;
+            max-width: 380px;
+        }
+
+        .academy-banner h2 span {
+            color: var(--red);
+        }
+
+        .academy-banner p {
+            color: #bbb;
+            font-size: 12px;
+            margin-top: 10px;
+            max-width: 350px;
+        }
+
+        /* RECENT ACTIVITY */
+
+        .activity-box {
+            min-height: 185px;
+        }
+
+        #activity {
+            color: #777;
+            font-size: 13px;
+            padding: 25px 5px;
+            text-align: center;
+        }
+
+        /* MOBILE HEADER */
+
+        .mobile-header {
+            display: none;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 1100px) {
 
             .cards {
                 grid-template-columns: repeat(2, 1fr);
             }
 
-            .actions {
-                grid-template-columns: repeat(2, 1fr);
+            .content-grid {
+                grid-template-columns: 1fr;
             }
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 700px) {
 
             .sidebar {
-                position: relative;
-                width: 100%;
-                height: auto;
+                transform: translateX(-100%);
+                transition: .3s ease;
+                width: 270px;
             }
 
-            .logout {
-                position: relative;
-                left: 0;
-                bottom: 0;
-                width: 100%;
-                margin-top: 20px;
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .mobile-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                height: 60px;
+                padding: 0 15px;
+                background: #0d0d0d;
+                border-bottom: 1px solid #292929;
+                position: sticky;
+                top: 0;
+                z-index: 900;
+            }
+
+            .mobile-brand {
+                display: flex;
+                align-items: center;
+                gap: 9px;
+            }
+
+            .mobile-brand img {
+                width: 38px;
+                height: 38px;
+                border-radius: 50%;
+                object-fit: contain;
+            }
+
+            .mobile-brand strong {
+                font-size: 13px;
+            }
+
+            .menu-toggle {
+                border: none;
+                background: #191919;
+                color: white;
+                width: 40px;
+                height: 40px;
+                border-radius: 9px;
+                font-size: 20px;
+                cursor: pointer;
             }
 
             .main {
                 margin-left: 0;
-                padding: 18px;
+                padding: 20px 14px 35px;
             }
 
             .topbar {
-                display: block;
+                align-items: flex-start;
+                margin-bottom: 22px;
             }
 
-            .admin-name {
-                display: inline-block;
-                margin-top: 12px;
+            .welcome h1 {
+                font-size: 24px;
+            }
+
+            .admin-profile {
+                display: none;
             }
 
             .cards {
@@ -243,8 +477,53 @@
                 gap: 10px;
             }
 
+            .card {
+                padding: 15px;
+                min-height: 125px;
+            }
+
+            .card h2 {
+                font-size: 24px;
+            }
+
+            .card-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 17px;
+                margin-bottom: 12px;
+            }
+
+            .actions {
+                grid-template-columns: 1fr 1fr;
+                gap: 9px;
+            }
+
+            .action {
+                padding: 14px;
+            }
+
+            .academy-banner {
+                min-height: 160px;
+                padding: 20px;
+            }
+
+            .academy-banner h2 {
+                font-size: 21px;
+            }
+        }
+
+        @media (max-width: 420px) {
+
+            .cards {
+                grid-template-columns: 1fr 1fr;
+            }
+
             .actions {
                 grid-template-columns: 1fr;
+            }
+
+            .welcome h1 {
+                font-size: 22px;
             }
         }
     </style>
@@ -252,93 +531,132 @@
 
 <body>
 
+    <!-- MOBILE HEADER -->
+
+    <header class="mobile-header">
+
+        <div class="mobile-brand">
+
+            <img src="images/bindasslogo.jpeg" alt="BKD">
+
+            <strong>Bindass Karate Do Academy</strong>
+
+        </div>
+
+        <button class="menu-toggle" onclick="toggleSidebar()">
+            ☰
+        </button>
+
+    </header>
+
+
     <!-- SIDEBAR -->
 
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
 
-        <div class="logo">
+        <div class="brand">
 
             <img src="images/bindasslogo.jpeg" alt="BKD Logo">
 
-            <h2>Bindass Karate</h2>
-            <p>Admin Panel</p>
+            <h2>BINDASS KARATE DO</h2>
+
+            <p>Academy • Admin Panel</p>
 
         </div>
+
 
         <ul class="menu">
 
             <li>
                 <button onclick="showMessage('Dashboard')">
-                    🏠 Dashboard
+                    🏠 &nbsp; Dashboard
                 </button>
             </li>
 
             <li>
                 <button onclick="window.location.href='students.html'">
-        👥 Students
-            </button>
-            </li>
-
-            <li>
-                <button onclick="window.location.href='attendance.html'">
-                    📋 Attendance
+                    👥 &nbsp; Students
                 </button>
             </li>
 
             <li>
-    <button onclick="window.location.href='fee-management.html'">
-        💰 Fee Management
-    </button>
-</li>
+                <button onclick="window.location.href='attendance.html'">
+                    📋 &nbsp; Attendance
+                </button>
+            </li>
+
+            <li>
+                <button onclick="window.location.href='fee-management.html'">
+                    💰 &nbsp; Fee Management
+                </button>
+            </li>
 
             <li>
                 <button onclick="showMessage('Notifications')">
-                    🔔 Notifications
+                    🔔 &nbsp; Notifications
                 </button>
             </li>
 
             <li>
                 <button onclick="showMessage('Tournament Results')">
-                    🏆 Tournament Results
+                    🏆 &nbsp; Tournament Results
                 </button>
             </li>
 
             <li>
                 <button onclick="showMessage('Belt Grading')">
-                    🥋 Belt Grading
+                    🥋 &nbsp; Belt Grading
                 </button>
             </li>
 
             <li>
                 <button onclick="showMessage('Gallery & Events')">
-                    🖼️ Gallery & Events
+                    🖼️ &nbsp; Gallery & Events
                 </button>
             </li>
 
         </ul>
 
+
         <button class="logout" onclick="logout()">
-            Logout
+            🚪 &nbsp; Logout
         </button>
 
     </aside>
 
 
-    <!-- MAIN CONTENT -->
+    <!-- MAIN -->
 
     <main class="main">
 
         <div class="topbar">
 
-            <div>
-                <h1>Admin Dashboard</h1>
-                <p style="color:#777; margin-top:5px;">
-                    Bindass Karate Do Academy
+            <div class="welcome">
+
+                <small>WELCOME BACK 👋</small>
+
+                <h1>
+                    Admin <span>Dashboard</span>
+                </h1>
+
+                <p>
+                    Manage Bindass Karate Do Academy from one place.
                 </p>
+
             </div>
 
-            <div class="admin-name">
-                👤 Administrator
+
+            <div class="admin-profile">
+
+                <div class="admin-avatar">
+                    👤
+                </div>
+
+                <div>
+                    <strong>Administrator</strong>
+                    <small>BKD Admin</small>
+                </div>
+
             </div>
 
         </div>
@@ -349,175 +667,457 @@
         <div class="cards">
 
             <div class="card">
+
+                <div class="card-icon">
+                    👥
+                </div>
+
                 <p>Total Students</p>
+
                 <h2 id="totalStudents">0</h2>
+
             </div>
 
+
             <div class="card">
+
+                <div class="card-icon">
+                    🟢
+                </div>
+
                 <p>Active Students</p>
+
                 <h2 id="activeStudents">0</h2>
+
             </div>
 
-            <div class="card">
-                <p>Fees Pending</p>
-                <h2 id="pendingFees">0</h2>
+
+        <div class="card">
+
+            <div class="card-icon">
+                💰
             </div>
 
-            <div class="card">
-                <p>Notifications</p>
-                <h2 id="notifications">0</h2>
-            </div>
+            <p>Fees Pending</p>
+
+            <h2 id="pendingFees">0</h2>
 
         </div>
 
 
-        <!-- QUICK ACTIONS -->
+        <div class="card">
 
-        <div class="section">
-
-            <h2>Quick Actions</h2>
-
-            <p>
-                Manage your academy from one place.
-            </p>
-
-            <div class="actions">
-
-                <div class="action" onclick="window.location.href='students.html'">
-                    <h3>➕ Add Student</h3>
-                    <p>Register a new student.</p>
-                </div>
-
-                <div class="action" onclick="window.location.href='attendance.html'">
-                    <h3>📋 Mark Attendance</h3>
-                    <p>Manage daily student attendance.</p>
-                </div>
-
-                <div class="action" onclick="window.location.href='fee-management.html'">
-                    <h3>💰 Manage Fees</h3>
-                    <p>Track student fee payments.</p>
-                </div>
-
-                <div class="action" onclick="showMessage('Notification')">
-                    <h3>🔔 Send Notice</h3>
-                    <p>Send important academy notices.</p>
-                </div>
-
-                <div class="action" onclick="showMessage('Tournament')">
-                    <h3>🏆 Add Result</h3>
-                    <p>Update tournament achievements.</p>
-                </div>
-
-                <div class="action" onclick="showMessage('Belt Grading')">
-                    <h3>🥋 Belt Grading</h3>
-                    <p>Manage grading and belt records.</p>
-                </div>
-
+            <div class="card-icon">
+                🔔
             </div>
+
+            <p>Notifications</p>
+
+            <h2 id="notifications">0</h2>
 
         </div>
 
+    </div>
+    <!-- TWO COLUMN AREA -->
 
-        <!-- RECENT ACTIVITY -->
+        <div class="content-grid">
 
-        <div class="section">
+            <!-- LEFT COLUMN -->
 
-            <h2>Recent Activity</h2>
+            <div>
 
-            <p id="activity">
-                No recent activity.
-            </p>
+                <!-- QUICK ACTIONS -->
+
+                <section class="section">
+
+                    <div class="section-header">
+
+                        <div>
+                            <h2>Quick Actions</h2>
+                            <p>Frequently used academy operations</p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="actions">
+
+                        <div class="action"
+                            onclick="window.location.href='students.html'">
+
+                            <div class="action-icon">
+                                ➕
+                            </div>
+
+                            <h3>Add Student</h3>
+
+                            <p>
+                                Register a new academy student.
+                            </p>
+
+                        </div>
+
+
+                        <div class="action"
+                            onclick="window.location.href='attendance.html'">
+
+                            <div class="action-icon">
+                                📋
+                            </div>
+
+                            <h3>Mark Attendance</h3>
+
+                            <p>
+                                Manage daily attendance.
+                            </p>
+
+                        </div>
+
+
+                        <div class="action"
+                            onclick="window.location.href='fee-management.html'">
+
+                            <div class="action-icon">
+                                💰
+                            </div>
+
+                            <h3>Manage Fees</h3>
+
+                            <p>
+                                Track student payments.
+                            </p>
+
+                        </div>
+
+
+                        <div class="action"
+                            onclick="showMessage('Notification')">
+
+                            <div class="action-icon">
+                                🔔
+                            </div>
+
+                            <h3>Send Notice</h3>
+
+                            <p>
+                                Send important academy notices.
+                            </p>
+
+                        </div>
+
+
+                        <div class="action"
+                            onclick="showMessage('Tournament')">
+
+                            <div class="action-icon">
+                                🏆
+                            </div>
+
+                            <h3>Add Result</h3>
+
+                            <p>
+                                Update tournament achievements.
+                            </p>
+
+                        </div>
+
+
+                        <div class="action"
+                            onclick="showMessage('Belt Grading')">
+
+                            <div class="action-icon">
+                                🥋
+                            </div>
+
+                            <h3>Belt Grading</h3>
+
+                            <p>
+                                Manage grading records.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- ACADEMY BANNER -->
+
+                <section class="academy-banner">
+
+                    <h2>
+                        TRAIN HARD.<br>
+                        <span>BUILD CHARACTER.</span><br>
+                        ACHIEVE GREATNESS.
+                    </h2>
+
+                    <p>
+                        Bindass Karate Do Academy •
+                        Discipline • Confidence • Excellence
+                    </p>
+
+                </section>
+
+            </div>
+
+
+            <!-- RIGHT COLUMN -->
+
+            <div>
+
+                <!-- RECENT ACTIVITY -->
+
+                <section class="section activity-box">
+
+                    <div class="section-header">
+
+                        <div>
+                            <h2>Recent Activity</h2>
+
+                            <p>
+                                Latest dashboard activity
+                            </p>
+                        </div>
+
+                        <span class="view-all">
+                            LIVE
+                        </span>
+
+                    </div>
+
+
+                    <p id="activity">
+                        No recent activity.
+                    </p>
+
+                </section>
+
+
+                <!-- ADMIN CONTROL -->
+
+                <section class="section">
+
+                    <div class="section-header">
+
+                        <div>
+                            <h2>Bindass Karate Do Academy</h2>
+
+                            <p>
+                                Admin Control Center
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <p style="
+                        color:#888;
+                        font-size:13px;
+                        line-height:1.7;
+                    ">
+
+                        Manage students, attendance, fees,
+                        notices, tournament achievements
+                        and belt grading from your academy
+                        dashboard.
+
+                    </p>
+
+                </section>
+
+            </div>
 
         </div>
 
     </main>
 
 
+    <!-- FIREBASE -->
+
     <script type="module">
 
-    import { initializeApp }
-        from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-
-    import {
-    getFirestore,
-    collection,
-    onSnapshot
-} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-
-import {
-    getAuth,
-    onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-
-    const firebaseConfig = {
-  apiKey: "AIzaSyCDpKF59MATfa-JaGF9yOBvHyi8i__3CFc",
-  authDomain: "bindass-karate-do-academy.firebaseapp.com",
-  projectId: "bindass-karate-do-academy",
-  storageBucket: "bindass-karate-do-academy.firebasestorage.app",
-  messagingSenderId: "360953215088",
-  appId: "1:360953215088:web:c4399bcd991abf98229cb5",
-  measurementId: "G-FWLX780V9Q"
-};
-
-    const app = initializeApp(firebaseConfig);
-
-const auth = getAuth(app);
-
-const db = getFirestore(app);
+        import { initializeApp }
+            from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 
 
-    // LOAD STUDENT STATISTICS
+        import {
+            getFirestore,
+            collection,
+            onSnapshot
+        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
-    onAuthStateChanged(auth, (user) => {
 
-    if (!user) {
-        window.location.href = "login.html";
-        return;
-    }
+        import {
+            getAuth,
+            onAuthStateChanged,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
-    onSnapshot(collection(db, "students"), (snapshot) => {
 
-        let total = 0;
-        let active = 0;
+        const firebaseConfig = {
 
-        snapshot.forEach((studentDoc) => {
+            apiKey:
+                "AIzaSyCDpKF59MATfa-JaGF9yOBvHyi8i__3CFc",
 
-            total++;
+            authDomain:
+                "bindass-karate-do-academy.firebaseapp.com",
 
-            const student = studentDoc.data();
+            projectId:
+                "bindass-karate-do-academy",
 
-            if (student.status === "Active") {
-                active++;
+            storageBucket:
+                "bindass-karate-do-academy.firebasestorage.app",
+
+            messagingSenderId:
+                "360953215088",
+
+            appId:
+                "1:360953215088:web:c4399bcd991abf98229cb5",
+
+            measurementId:
+                "G-FWLX780V9Q"
+
+        };
+
+
+        const app = initializeApp(firebaseConfig);
+
+        const auth = getAuth(app);
+
+        const db = getFirestore(app);
+
+
+        /* =========================
+           AUTH + STUDENT STATISTICS
+        ========================= */
+
+        onAuthStateChanged(auth, (user) => {
+
+            if (!user) {
+
+                window.location.replace("login.html");
+
+                return;
+
             }
+
+
+            onSnapshot(
+                collection(db, "students"),
+                (snapshot) => {
+
+                    let total = 0;
+
+                    let active = 0;
+
+
+                    snapshot.forEach((studentDoc) => {
+
+                        total++;
+
+                        const student =
+                            studentDoc.data();
+
+
+                        if (
+                            student.status === "Active"
+                        ) {
+
+                            active++;
+
+                        }
+
+                    });
+
+
+                    document.getElementById(
+                        "totalStudents"
+                    ).textContent = total;
+
+
+                    document.getElementById(
+                        "activeStudents"
+                    ).textContent = active;
+
+                }
+            );
 
         });
 
-        document.getElementById("totalStudents").textContent = total;
-        document.getElementById("activeStudents").textContent = active;
 
-    });
+        /* =========================
+           ACTIVITY MESSAGE
+        ========================= */
 
-});
+        function showMessage(section) {
+
+            document.getElementById(
+                "activity"
+            ).textContent =
+                section + " section selected.";
+
+        }
 
 
-    function showMessage(section) {
+        /* =========================
+           LOGOUT
+        ========================= */
 
-        document.getElementById("activity").textContent =
-            section + " section selected.";
+        async function logout() {
 
-    }
+            try {
+
+                await signOut(auth);
+
+                localStorage.removeItem(
+                    "bkdLoginRole"
+                );
+
+                window.location.replace(
+                    "login.html"
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "Logout error:",
+                    error
+                );
+
+                alert(
+                    "Unable to logout. Please try again."
+                );
+
+            }
+
+        }
 
 
-    function logout() {
+        /* =========================
+           MOBILE SIDEBAR
+        ========================= */
 
-        window.location.href = "login.html";
+        function toggleSidebar() {
 
-    }
+            document
+                .getElementById("sidebar")
+                .classList.toggle("open");
 
-    window.showMessage = showMessage;
-    window.logout = logout;
+        }
 
-</script>
+
+        window.showMessage =
+            showMessage;
+
+        window.logout =
+            logout;
+
+        window.toggleSidebar =
+            toggleSidebar;
+
+    </script>
 
 </body>
+
 </html>
