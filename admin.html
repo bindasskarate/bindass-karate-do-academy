@@ -592,10 +592,10 @@
             </li>
 
             <li>
-                <button onclick="showMessage('Notifications')">
-                    🔔 &nbsp; Notifications
-                </button>
-            </li>
+    <button onclick="openNoticeModal()">
+        🔔 &nbsp; Notifications
+    </button>
+</li>
 
             <li>
                 <button onclick="showMessage('Tournament Results')">
@@ -791,8 +791,7 @@
 
 
                         <div class="action"
-                            onclick="showMessage('Notification')">
-
+    onclick="openNoticeModal()">
                             <div class="action-icon">
                                 🔔
                             </div>
@@ -932,7 +931,97 @@
 
     </main>
 
+<!-- NOTICE MODAL -->
 
+<div id="noticeModal" style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.75);
+    z-index:9999;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+">
+
+    <div style="
+        width:100%;
+        max-width:450px;
+        background:#151515;
+        border:1px solid #333;
+        border-radius:16px;
+        padding:25px;
+    ">
+
+        <h2>📢 Send Notice</h2>
+
+        <input
+            id="noticeTitle"
+            type="text"
+            placeholder="Notice title"
+            style="
+                width:100%;
+                padding:13px;
+                margin-top:15px;
+                border-radius:9px;
+                border:1px solid #444;
+                background:#111;
+                color:white;
+            "
+        >
+
+        <textarea
+            id="noticeMessage"
+            placeholder="Write your notice..."
+            rows="5"
+            style="
+                width:100%;
+                padding:13px;
+                margin-top:10px;
+                border-radius:9px;
+                border:1px solid #444;
+                background:#111;
+                color:white;
+                resize:vertical;
+            "
+        ></textarea>
+
+        <button
+            onclick="saveNotice()"
+            style="
+                width:100%;
+                margin-top:12px;
+                padding:13px;
+                border:0;
+                border-radius:9px;
+                background:#e50914;
+                color:white;
+                font-weight:bold;
+                cursor:pointer;
+            "
+        >
+            📢 Publish Notice
+        </button>
+
+        <button
+            onclick="closeNoticeModal()"
+            style="
+                width:100%;
+                margin-top:10px;
+                padding:12px;
+                border:0;
+                border-radius:9px;
+                background:#292929;
+                color:white;
+                cursor:pointer;
+            "
+        >
+            Cancel
+        </button>
+
+    </div>
+
+</div>
     <!-- FIREBASE -->
 
     <script type="module">
@@ -942,11 +1031,12 @@
 
 
         import {
-            getFirestore,
-            collection,
-            onSnapshot
-        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-
+    getFirestore,
+    collection,
+    onSnapshot,
+    addDoc,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
         import {
             getAuth,
@@ -1106,7 +1196,114 @@
 
         }
 
+/* =========================
+   NOTIFICATIONS
+========================= */
 
+function openNoticeModal() {
+
+    document.getElementById(
+        "noticeModal"
+    ).style.display = "flex";
+
+}
+
+
+function closeNoticeModal() {
+
+    document.getElementById(
+        "noticeModal"
+    ).style.display = "none";
+
+}
+
+
+async function saveNotice() {
+
+    const title =
+        document.getElementById(
+            "noticeTitle"
+        ).value.trim();
+
+    const message =
+        document.getElementById(
+            "noticeMessage"
+        ).value.trim();
+
+
+    if (!title || !message) {
+
+        alert(
+            "Please enter the notice title and message."
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        await addDoc(
+            collection(
+                db,
+                "notifications"
+            ),
+            {
+                title: title,
+                message: message,
+                active: true,
+                date:
+                    new Date()
+                        .toISOString()
+                        .slice(0, 10),
+                createdAt:
+                    serverTimestamp()
+            }
+        );
+
+
+        document.getElementById(
+            "noticeTitle"
+        ).value = "";
+
+        document.getElementById(
+            "noticeMessage"
+        ).value = "";
+
+
+        closeNoticeModal();
+
+
+        alert(
+            "✅ Notice published successfully."
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Notice error:",
+            error
+        );
+
+        alert(
+            "Unable to publish notice."
+        );
+
+    }
+
+}
+
+
+window.openNoticeModal =
+    openNoticeModal;
+
+window.closeNoticeModal =
+    closeNoticeModal;
+
+window.saveNotice =
+    saveNotice;
         window.showMessage =
             showMessage;
 
