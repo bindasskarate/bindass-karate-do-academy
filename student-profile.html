@@ -1091,68 +1091,61 @@ body {
 
     <!-- CHANGE PASSWORD -->
 
-    <div id="securityModal" class="modal">
-<div class="modal-box">
-<div class="modal-head">
-<div>
-<h3>🔐 Account Security</h3>
-<small>Change your password</small>
-</div>
-<button onclick="closeSecurity()">✕</button>
-</div>
+    <div
+        id="changePasswordSection"
+        class="section"
+        style="display:none;"
+    >
 
-<label>Current Password</label>
-<input type="password" id="currentPassword">
+        <div class="section-title">
 
-<label>New Password</label>
-<input type="password" id="newPassword">
+            <div class="section-icon">
+                🔐
+            </div>
 
-<label>Confirm Password</label>
-<input type="password" id="confirmPassword">
+            <h3>
+                Change Password
+            </h3>
 
-<button class="main-btn" id="changePasswordBtn">
-🔐 Change Password
-</button>
+        </div>
 
-<p id="passwordMessage"></p>
-</div>
-</div>
 
-<style>
-.modal{
-position:fixed;inset:0;background:#0009;
-display:none;align-items:center;justify-content:center;
-padding:18px;z-index:100;
-}
-.modal.show{display:flex}
-.modal-box{
-background:#fff;width:min(430px,100%);
-padding:23px;border-radius:22px;
-animation:up .3s ease;
-}
-.modal-head{
-display:flex;justify-content:space-between;
-margin-bottom:20px;
-}
-.modal-head button{
-border:0;background:#eee;border-radius:9px;
-width:34px;height:34px;cursor:pointer;
-}
-.modal-box label{
-display:block;font-size:12px;font-weight:bold;
-margin:13px 0 6px;
-}
-.modal-box input{
-width:100%;padding:12px;border:1px solid #ddd;
-border-radius:10px;outline:none;
-}
-.main-btn{
-width:100%;border:0;background:#dc2626;
-color:#fff;padding:13px;border-radius:11px;
-font-weight:bold;margin-top:18px;cursor:pointer;
-}
-#passwordMessage{font-size:12px;margin-top:12px}
-</style>
+        <div class="password-grid">
+
+            <input
+                type="password"
+                id="currentPassword"
+                placeholder="Current Password"
+            >
+
+            <input
+                type="password"
+                id="newPassword"
+                placeholder="New Password"
+            >
+
+            <input
+                type="password"
+                id="confirmPassword"
+                placeholder="Confirm New Password"
+            >
+
+            <button
+                id="changePasswordBtn"
+                class="change-password-btn"
+                type="button"
+            >
+                🔐 Change Password
+            </button>
+
+            <p
+                id="passwordMessage"
+                style="font-size:14px;"
+            ></p>
+
+        </div>
+
+    </div>
 
 </main>
 <script type="module">
