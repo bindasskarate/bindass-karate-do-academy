@@ -565,21 +565,28 @@
 
 
         const image =
-            document.createElement("img");
+    document.createElement("img");
 
-        image.className =
-            "gallery-image";
+image.className =
+    "gallery-image";
 
-        image.src =
-            photo.imageUrl || "";
+image.src =
+    photo.imagePath
+        ? "https://bindasskarate.github.io/bindass-karate-do-academy/" + photo.imagePath
+        : photo.imageUrl || "";
 
-        image.alt =
-            photo.title ||
-            "BKDA Gallery Photo";
+image.alt =
+    photo.title ||
+    "BKDA Gallery Photo";
 
-        image.loading =
-            "lazy";
+image.loading =
+    "lazy";
 
+image.style.cursor = "pointer";
+
+image.onclick = () => {
+    window.open(image.src, "_blank");
+};
 
         const info =
             document.createElement("div");
