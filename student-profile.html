@@ -1461,6 +1461,14 @@ body.dark-theme td {
         display: block;
     }
 }
+/* Keep fee amounts black in dark mode */
+body.dark-theme #feesSection .amount,
+body.dark-theme #feesSection .fee-amount,
+body.dark-theme #feesSection .pending-amount,
+body.dark-theme #feesSection .paid-amount,
+body.dark-theme #feesSection .due-amount {
+    color: #000 !important;
+}
 /* =========================
    DARK THEME - FEES FIX
 ========================= */
