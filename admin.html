@@ -1386,6 +1386,10 @@ async function saveNotice() {
 
     try {
 
+        /* =================================================
+           1. SAVE NOTICE TO FIRESTORE
+        ================================================= */
+
         await addDoc(
             collection(
                 db,
@@ -1405,6 +1409,106 @@ async function saveNotice() {
         );
 
 
+        /* =================================================
+           2. GET STUDENT FCM TOKENS
+        ================================================= */
+
+        const studentsSnapshot =
+            await getDocs(
+                collection(
+                    db,
+                    "students"
+                )
+            );
+
+
+        const tokens = [];
+
+
+        studentsSnapshot.forEach(
+            (studentDoc) => {
+
+                const student =
+                    studentDoc.data();
+
+                if (
+                    student.fcmToken &&
+                    student.notificationsEnabled === true
+                ) {
+
+                    tokens.push(
+                        student.fcmToken
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* =================================================
+           3. SEND PUSH NOTIFICATION
+        ================================================= */
+
+        if (tokens.length > 0) {
+
+            const response =
+                await fetch(
+                    GALLERY_WORKER_URL +
+                    "/send-notification",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            title: title,
+
+                            body: message,
+
+                            tokens: tokens
+
+                        })
+                    }
+                );
+
+
+            const result =
+                await response.json();
+
+
+            if (!response.ok ||
+                !result.success) {
+
+                throw new Error(
+                    result.error ||
+                    "Push notification failed."
+                );
+
+            }
+
+            console.log(
+                "Push notifications sent:",
+                result.sent
+            );
+
+        } else {
+
+            console.log(
+                "No students have notification tokens."
+            );
+
+        }
+
+
+        /* =================================================
+           4. CLEAR FORM
+        ================================================= */
+
         document.getElementById(
             "noticeTitle"
         ).value = "";
@@ -1417,17 +1521,30 @@ async function saveNotice() {
         closeNoticeModal();
 
 
+        /* =================================================
+           5. SUCCESS MESSAGE
+        ================================================= */
+
         alert(
-            "✅ Notice published successfully."
+            "✅ Notice published and notifications sent."
         );
 
 
     } catch (error) {
-    console.error("Notice error:", error);
-    alert("Notice error: " + error.message);
-}
-}
 
+        console.error(
+            "Notice error:",
+            error
+        );
+
+        alert(
+            "Notice error: " +
+            error.message
+        );
+
+    }
+
+}
 
 window.openNoticeModal =
     openNoticeModal;
