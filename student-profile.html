@@ -1897,7 +1897,11 @@ if (savedTheme === "dark") {
 import {
     initializeApp
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-
+import {
+    getMessaging,
+    getToken,
+    onMessage
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-messaging.js";
 
 import {
     getAuth,
@@ -1953,7 +1957,7 @@ const firebaseConfig = {
 
 const app =
     initializeApp(firebaseConfig);
-
+const messaging = getMessaging(app);
 const auth =
     getAuth(app);
 
@@ -2493,7 +2497,66 @@ async function checkPendingPayment() {
     }
 
 }
+async function setupStudentNotifications() {
 
+    try {
+
+        if (!("Notification" in window)) {
+            console.log("This browser does not support notifications.");
+            return;
+        }
+
+        if (!("serviceWorker" in navigator)) {
+            console.log("Service workers are not supported.");
+            return;
+        }
+
+        const permission = await Notification.requestPermission();
+
+        if (permission !== "granted") {
+            console.log("Notification permission not granted.");
+            return;
+        }
+
+        const registration =
+            await navigator.serviceWorker.register(
+                "/bindass-karate-do-academy/firebase-messaging-sw.js"
+            );
+
+        const token = await getToken(messaging, {
+            vapidKey: "BBdj98Iyw5KCLAtGjyaqAi7NMEfxaYFNUpuXhyR1X_1yz5OSk-emqo0AY2Dj-F-bf12z912pD8om7o2u677srm0",
+            serviceWorkerRegistration: registration
+        });
+
+        if (!token) {
+            console.log("No FCM token received.");
+            return;
+        }
+
+        console.log("FCM token:", token);
+
+        if (studentId) {
+
+            await updateDoc(
+                doc(db, "students", studentId),
+                {
+                    fcmToken: token,
+                    notificationsEnabled: true,
+                    notificationUpdatedAt: serverTimestamp()
+                }
+            );
+
+            console.log("FCM token saved.");
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Notification setup error:",
+            error
+        );
+    }
+}
 async function loadStudentGallery() {
 
     const grid = document.getElementById("studentGalleryGrid");
@@ -4197,7 +4260,7 @@ onAuthStateChanged(
              */
 
             await loadStudentProfile();
-
+await setupStudentNotifications();
         } catch (error) {
 
             console.error(
