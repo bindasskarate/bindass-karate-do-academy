@@ -1414,6 +1414,23 @@ body.dark-theme th {
 body.dark-theme td {
     border-color: #292929;
 }
+.sidebar-close {
+    display: none;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .sidebar-close {
+        display: block;
+    }
+}
 
 </style>
 
@@ -1433,7 +1450,7 @@ body.dark-theme td {
 
 <!-- SIDEBAR -->
 <aside class="sidebar" id="studentSidebar">
-
+<button class="sidebar-close" onclick="toggleSidebar()">✕</button>
     <div class="sidebar-brand">
 
         <img
@@ -1442,7 +1459,7 @@ body.dark-theme td {
         >
 
         <div>
-            <strong>Bindass Karate</strong>
+            <strong>Bindass Karate Do Academy</strong>
             <small>Student Portal</small>
         </div>
 
@@ -1648,19 +1665,19 @@ body.dark-theme td {
 </main>
 <script>
 
-function scrollToSection(id) {
 
-    const element =
+function scrollToSection(id) {
+    const section =
         document.getElementById(id);
 
-    if (element) {
-
-        element.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
+    if (section) {
+        section.scrollIntoView({
+            behavior: "smooth"
         });
-
     }
+
+    closeSidebar();
+}
 
     document
         .querySelectorAll(".nav-item")
@@ -1669,8 +1686,13 @@ function scrollToSection(id) {
         });
 
     event?.currentTarget?.classList.add("active");
-}
 
+
+function closeSidebar() {
+    document
+        .getElementById("studentSidebar")
+        .classList.remove("open");
+}
 
 document
     .getElementById("mobileMenuBtn")
