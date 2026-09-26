@@ -1714,14 +1714,7 @@ function scrollToSection(id) {
     closeSidebar();
 }
 
-    document
-        .querySelectorAll(".nav-item")
-        .forEach(button => {
-            button.classList.remove("active");
-        });
-
-    event?.currentTarget?.classList.add("active");
-
+    
 
 function closeSidebar() {
     document
@@ -1729,6 +1722,12 @@ function closeSidebar() {
         .classList.remove("open");
 }
 
+document
+    .getElementById("sidebarCloseBtn")
+    ?.addEventListener("click", function () {
+        closeSidebar();
+    });
+    
 document
     .getElementById("mobileMenuBtn")
     ?.addEventListener(
