@@ -14,6 +14,77 @@
 
 <style>
 
+.student-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.student-gallery-card {
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    box-shadow: 0 5px 18px rgba(0,0,0,.07);
+}
+
+.student-gallery-image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+    cursor: pointer;
+    background: #111;
+}
+
+.student-gallery-info {
+    padding: 14px;
+}
+
+.student-gallery-info h4 {
+    margin: 0 0 6px;
+    font-size: 15px;
+    color: #111827;
+}
+
+.student-gallery-info p {
+    margin: 0 0 7px;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.student-gallery-info small {
+    color: #9ca3af;
+    font-size: 11px;
+}
+
+body.dark-theme .student-gallery-card {
+    background: #111;
+    border-color: #292929;
+}
+
+body.dark-theme .student-gallery-info h4 {
+    color: #fff;
+}
+
+body.dark-theme .student-gallery-info p {
+    color: #aaa;
+}
+
+body.dark-theme .student-gallery-info small {
+    color: #777;
+}
+
+@media (max-width: 600px) {
+    .student-gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .student-gallery-image {
+        height: 150px;
+    }
+}
 /* =========================================================
    GLOBAL
 ========================================================= */
@@ -2403,131 +2474,72 @@ async function checkPendingPayment() {
 
 }
 
-
-/* =========================================================
-   LOAD STUDENT PROFILE
-========================================================= */
-
-async function loadStudentProfile() {
-
-    if (!studentId) {
-
-        profile.innerHTML = `
-
-            <div class="section">
-
-                <div class="section-title">
-
-                    <div class="section-icon">
-                        ⚠️
-                    </div>
-
-                    <h3>
-                        Student ID not found
-                    </h3>
-
-                </div>
-
-                <div class="placeholder">
-                    Please open the student profile
-                    from the Students page.
-                </div>
-
-            </div>
-
-        `;
-
-        return;
-
-    }
 async function loadStudentGallery() {
 
-    const grid =
-        document.getElementById("studentGalleryGrid");
+    const grid = document.getElementById("studentGalleryGrid");
 
     if (!grid) return;
 
     try {
 
-        const snapshot =
-            await getDocs(
-                collection(db, "gallery")
-            );
+        const snapshot = await getDocs(
+            collection(db, "gallery")
+        );
 
         grid.innerHTML = "";
 
         if (snapshot.empty) {
+
             grid.innerHTML = `
                 <div class="placeholder">
                     No gallery photos yet.
                 </div>
             `;
+
             return;
         }
 
         snapshot.forEach((docSnap) => {
 
-            const photo =
-                docSnap.data();
+            const photo = docSnap.data();
 
-            const card =
-                document.createElement("div");
+            const card = document.createElement("div");
+            card.className = "student-gallery-card";
 
-            card.style.cssText = `
-                background:#fff;
-                border-radius:14px;
-                overflow:hidden;
-                box-shadow:0 4px 15px rgba(0,0,0,0.08);
-            `;
+            const image = document.createElement("img");
 
-            const image =
-                document.createElement("img");
+            image.className = "student-gallery-image";
 
-            image.src =
-                photo.imagePath
-                    ? "https://bindasskarate.github.io/bindass-karate-do-academy/" +
-                      photo.imagePath
-                    : photo.imageUrl || "";
+            image.src = photo.imagePath
+                ? "https://bindasskarate.github.io/bindass-karate-do-academy/" + photo.imagePath
+                : photo.imageUrl || "";
 
-            image.alt =
-                photo.title || "BKDA Gallery";
-
-            image.style.cssText = `
-                width:100%;
-                height:220px;
-                object-fit:cover;
-                display:block;
-                cursor:pointer;
-            `;
+            image.alt = photo.title || "BKDA Gallery Photo";
+            image.loading = "lazy";
 
             image.onclick = () => {
-                window.open(
-                    image.src,
-                    "_blank"
-                );
+                window.open(image.src, "_blank");
             };
 
-            const info =
-                document.createElement("div");
-
-            info.style.padding = "14px";
+            const info = document.createElement("div");
+            info.className = "student-gallery-info";
 
             info.innerHTML = `
-                <h4 style="margin:0 0 6px;">
-                    ${photo.title || ""}
+                <h4>
+                    ${escapeHTML(photo.title || "BKDA Academy")}
                 </h4>
 
-                <p style="
-                    margin:0 0 6px;
-                    color:#666;
-                    font-size:14px;
-                ">
-                    ${photo.description || ""}
-                </p>
+                ${
+                    photo.description
+                        ? `<p>${escapeHTML(photo.description)}</p>`
+                        : ""
+                }
 
-                <small style="color:#888;">
-                    ${photo.date || ""}
-                </small>
+                ${
+                    photo.date
+                        ? `<small>${escapeHTML(photo.date)}</small>`
+                        : ""
+                }
             `;
 
             card.appendChild(image);
@@ -2538,10 +2550,7 @@ async function loadStudentGallery() {
 
     } catch (error) {
 
-        console.error(
-            "Gallery loading error:",
-            error
-        );
+        console.error("Gallery loading error:", error);
 
         grid.innerHTML = `
             <div class="placeholder">
@@ -2550,9 +2559,6 @@ async function loadStudentGallery() {
         `;
     }
 }
-
-    try {
-
         /* =================================================
            STUDENT DOCUMENT
         ================================================= */
@@ -3593,6 +3599,23 @@ studentData =
 
     ${noticesHTML}
 </div>
+<div class="section" id="gallerySection">
+
+    <div class="section-title">
+        <div class="section-icon">🖼️</div>
+        <h3>Academy Gallery</h3>
+    </div>
+
+    <div
+        id="studentGalleryGrid"
+        class="student-gallery-grid"
+    >
+        <div class="placeholder">
+            Loading gallery...
+        </div>
+    </div>
+
+</div>
                         <!-- =========================================
                  FEES
             ========================================== -->
@@ -3912,7 +3935,7 @@ studentData =
        
 
 
-    } catch (error) {
+     catch (error) {
 
         console.error(
             "Profile loading error:",
@@ -3972,10 +3995,11 @@ studentData =
 
 </div>
         `;
-
-    }
+        await loadStudentGallery();
 
 }
+
+
 
 
 /* =========================================================
