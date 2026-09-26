@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Gallery | Bindass Karate Do Academy</title>
+    <title>Gallery & Events | BKDA Admin</title>
 
     <style>
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -16,7 +18,7 @@
         body {
             font-family: Arial, sans-serif;
             background: #0b0b0b;
-            color: #fff;
+            color: white;
         }
 
         header {
@@ -32,49 +34,50 @@
             max-width: 1200px;
             margin: auto;
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            gap: 20px;
+            align-items: center;
+            gap: 15px;
         }
 
         .logo {
+            color: #e50914;
             font-size: 22px;
             font-weight: bold;
-            color: #e50914;
         }
 
-        .back-btn {
+        .back-btn,
+        .add-btn {
+            border: 0;
             text-decoration: none;
-            color: #fff;
             background: #e50914;
-            padding: 10px 16px;
+            color: white;
+            padding: 11px 18px;
             border-radius: 8px;
             font-weight: bold;
+            cursor: pointer;
         }
 
-        .hero {
-            text-align: center;
-            padding: 55px 20px 35px;
-        }
-
-        .hero h1 {
-            font-size: 42px;
-            margin-bottom: 10px;
-        }
-
-        .hero h1 span {
-            color: #e50914;
-        }
-
-        .hero p {
-            color: #aaa;
-            font-size: 16px;
-        }
-
-        .gallery-container {
+        .container {
             max-width: 1200px;
             margin: auto;
-            padding: 20px;
+            padding: 35px 20px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+        }
+
+        .page-header p {
+            color: #888;
+            margin-top: 6px;
         }
 
         #galleryGrid {
@@ -88,17 +91,11 @@
             border: 1px solid #292929;
             border-radius: 14px;
             overflow: hidden;
-            transition: transform .2s, border-color .2s;
-        }
-
-        .gallery-card:hover {
-            transform: translateY(-4px);
-            border-color: #e50914;
         }
 
         .gallery-image {
             width: 100%;
-            height: 240px;
+            height: 230px;
             object-fit: cover;
             display: block;
             background: #111;
@@ -109,96 +106,256 @@
         }
 
         .gallery-title {
-            font-size: 20px;
+            font-size: 19px;
             font-weight: bold;
             margin-bottom: 8px;
         }
 
         .gallery-description {
-            color: #aaa;
-            line-height: 1.5;
+            color: #999;
             font-size: 14px;
+            line-height: 1.5;
+            min-height: 21px;
         }
 
         .gallery-date {
             color: #e50914;
             font-size: 13px;
-            margin-top: 12px;
+            margin-top: 10px;
+        }
+
+        .delete-btn {
+            width: 100%;
+            margin-top: 15px;
+            padding: 11px;
+            border: 0;
+            border-radius: 8px;
+            background: #292929;
+            color: #ff5c5c;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background: #3a1717;
         }
 
         .message {
             text-align: center;
+            color: #777;
             padding: 60px 20px;
-            color: #aaa;
-            font-size: 17px;
         }
 
-        .error {
-            color: #ff5c5c;
+        /* MODAL */
+
+        #galleryModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.8);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
 
-        @media (max-width: 800px) {
+        .modal-box {
+            width: 100%;
+            max-width: 500px;
+            background: #151515;
+            border: 1px solid #333;
+            border-radius: 16px;
+            padding: 25px;
+        }
+
+        .modal-box h2 {
+            margin-bottom: 5px;
+        }
+
+        .modal-box input,
+        .modal-box textarea {
+            width: 100%;
+            padding: 13px;
+            margin-top: 10px;
+            border-radius: 9px;
+            border: 1px solid #444;
+            background: #111;
+            color: white;
+            font-family: inherit;
+        }
+
+        .modal-box textarea {
+            resize: vertical;
+        }
+
+        .upload-btn {
+            width: 100%;
+            margin-top: 12px;
+            padding: 13px;
+            border: 0;
+            border-radius: 9px;
+            background: #e50914;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .cancel-btn {
+            width: 100%;
+            margin-top: 10px;
+            padding: 12px;
+            border: 0;
+            border-radius: 9px;
+            background: #292929;
+            color: white;
+            cursor: pointer;
+        }
+
+        @media (max-width: 850px) {
+
             #galleryGrid {
                 grid-template-columns: repeat(2, 1fr);
             }
 
-            .hero h1 {
-                font-size: 34px;
-            }
         }
 
         @media (max-width: 550px) {
+
+            .header-inner,
+            .page-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .back-btn,
+            .add-btn {
+                text-align: center;
+            }
+
             #galleryGrid {
                 grid-template-columns: 1fr;
             }
 
-            .gallery-image {
-                height: 230px;
-            }
-
-            .header-inner {
-                flex-direction: column;
-            }
         }
+
     </style>
+
 </head>
 
 <body>
 
 <header>
+
     <div class="header-inner">
+
         <div class="logo">
-            🥋 BKDA
+            🥋 BKDA Admin
         </div>
 
-        <a href="index.html" class="back-btn">
-            ← Back to Home
+        <a href="admin.html" class="back-btn">
+            ← Back to Admin
         </a>
+
     </div>
+
 </header>
 
-<section class="hero">
-    <h1>Our <span>Gallery</span></h1>
-    <p>Moments, training, competitions and events from Bindass Karate Do Academy</p>
-</section>
 
-<main class="gallery-container">
+<main class="container">
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>🖼️ Gallery & Events</h1>
+
+            <p>
+                View, add and manage academy photos.
+            </p>
+
+        </div>
+
+        <button
+            class="add-btn"
+            onclick="openGalleryModal()"
+        >
+            + Add Photo
+        </button>
+
+    </div>
+
 
     <div id="loadingMessage" class="message">
         Loading gallery...
     </div>
 
+
     <div id="galleryGrid"></div>
 
-    <div id="emptyMessage" class="message" style="display:none;">
-        No gallery photos available yet.
-    </div>
 
-    <div id="errorMessage" class="message error" style="display:none;">
-        Unable to load the gallery.
+    <div
+        id="emptyMessage"
+        class="message"
+        style="display:none;"
+    >
+        No gallery photos uploaded yet.
+        <br><br>
+
+        Click <b>+ Add Photo</b> to upload one.
     </div>
 
 </main>
+
+
+<!-- GALLERY MODAL -->
+
+<div id="galleryModal">
+
+    <div class="modal-box">
+
+        <h2>🖼️ Add Gallery Photo</h2>
+
+        <input
+            id="galleryFile"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+        >
+
+        <input
+            id="galleryTitle"
+            type="text"
+            placeholder="Photo title"
+        >
+
+        <textarea
+            id="galleryDescription"
+            placeholder="Description"
+            rows="4"
+        ></textarea>
+
+        <input
+            id="galleryDate"
+            type="date"
+        >
+
+        <button
+            class="upload-btn"
+            onclick="uploadGalleryPhoto()"
+        >
+            📤 Upload & Publish
+        </button>
+
+        <button
+            class="cancel-btn"
+            onclick="closeGalleryModal()"
+        >
+            Cancel
+        </button>
+
+    </div>
+
+</div>
+
 
 <script type="module">
 
@@ -208,193 +365,623 @@
     import {
         getFirestore,
         collection,
-        onSnapshot
+        onSnapshot,
+        addDoc,
+        deleteDoc,
+        doc,
+        serverTimestamp
     } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
+    import {
+        getAuth,
+        onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
-    // SAME FIREBASE CONFIG AS YOUR ADMIN PANEL
+
+    /* =========================
+       FIREBASE
+    ========================= */
+
     const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "bindass-karate-do-academy.firebaseapp.com",
-        projectId: "bindass-karate-do-academy",
-        storageBucket: "bindass-karate-do-academy.firebasestorage.app",
-        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-        appId: "YOUR_APP_ID"
+
+        apiKey:
+            "AIzaSyCDpKF59MATfa-JaGF9yOBvHyi8i__3CFc",
+
+        authDomain:
+            "bindass-karate-do-academy.firebaseapp.com",
+
+        projectId:
+            "bindass-karate-do-academy",
+
+        storageBucket:
+            "bindass-karate-do-academy.firebasestorage.app",
+
+        messagingSenderId:
+            "360953215088",
+
+        appId:
+            "1:360953215088:web:c4399bcd991abf98229cb5",
+
+        measurementId:
+            "G-FWLX780V9Q"
+
     };
 
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const app =
+        initializeApp(firebaseConfig);
+
+    const auth =
+        getAuth(app);
+
+    const db =
+        getFirestore(app);
 
 
-    const galleryGrid =
-        document.getElementById("galleryGrid");
+    /* =========================
+       CLOUDFLARE WORKER
+    ========================= */
 
-    const loadingMessage =
-        document.getElementById("loadingMessage");
-
-    const emptyMessage =
-        document.getElementById("emptyMessage");
-
-    const errorMessage =
-        document.getElementById("errorMessage");
+    const GALLERY_WORKER_URL =
+        "https://bkda-gallery-upload.aligaming8976.workers.dev";
 
 
-    onSnapshot(
-        collection(db, "gallery"),
+    /* =========================
+       AUTH CHECK
+    ========================= */
 
-        (snapshot) => {
+    onAuthStateChanged(auth, (user) => {
 
-            loadingMessage.style.display = "none";
+        if (!user) {
 
-            galleryGrid.innerHTML = "";
+            window.location.replace(
+                "login.html"
+            );
 
-            if (snapshot.empty) {
+            return;
 
-                emptyMessage.style.display = "block";
+        }
 
-                return;
-            }
+        loadGallery();
 
-            emptyMessage.style.display = "none";
+    });
 
 
-            const photos = [];
+    /* =========================
+       LOAD GALLERY
+    ========================= */
 
-            snapshot.forEach((doc) => {
+    function loadGallery() {
 
-                photos.push({
-                    id: doc.id,
-                    ...doc.data()
+        onSnapshot(
+            collection(db, "gallery"),
+
+            (snapshot) => {
+
+                const grid =
+                    document.getElementById(
+                        "galleryGrid"
+                    );
+
+                const loading =
+                    document.getElementById(
+                        "loadingMessage"
+                    );
+
+                const empty =
+                    document.getElementById(
+                        "emptyMessage"
+                    );
+
+
+                loading.style.display = "none";
+
+                grid.innerHTML = "";
+
+
+                if (snapshot.empty) {
+
+                    empty.style.display = "block";
+
+                    return;
+
+                }
+
+
+                empty.style.display = "none";
+
+
+                const photos = [];
+
+
+                snapshot.forEach((galleryDoc) => {
+
+                    photos.push({
+
+                        id: galleryDoc.id,
+
+                        ...galleryDoc.data()
+
+                    });
+
                 });
 
-            });
+
+                photos.sort((a, b) => {
+
+                    return (
+                        (b.date || "")
+                        .localeCompare(
+                            a.date || ""
+                        )
+                    );
+
+                });
 
 
-            photos.sort((a, b) => {
+                photos.forEach((photo) => {
 
-                const dateA =
-                    a.date || "";
+                    createGalleryCard(
+                        photo,
+                        grid
+                    );
 
-                const dateB =
-                    b.date || "";
+                });
 
-                return dateB.localeCompare(dateA);
+            },
 
-            });
+            (error) => {
 
+                console.error(
+                    "Gallery loading error:",
+                    error
+                );
 
-            photos.forEach((photo) => {
+                document.getElementById(
+                    "loadingMessage"
+                ).textContent =
+                    "Unable to load gallery.";
 
-                if (!photo.imageUrl) {
-                    return;
-                }
+            }
+        );
 
-
-                const card =
-                    document.createElement("div");
-
-                card.className =
-                    "gallery-card";
-
-
-                const image =
-                    document.createElement("img");
-
-                image.className =
-                    "gallery-image";
-
-                image.src =
-                    photo.imageUrl;
-
-                image.alt =
-                    photo.title || "BKDA Gallery Photo";
-
-                image.loading =
-                    "lazy";
+    }
 
 
-                const info =
-                    document.createElement("div");
+    /* =========================
+       CREATE PHOTO CARD
+    ========================= */
 
-                info.className =
-                    "gallery-info";
+    function createGalleryCard(
+        photo,
+        grid
+    ) {
 
+        const card =
+            document.createElement("div");
 
-                const title =
-                    document.createElement("div");
-
-                title.className =
-                    "gallery-title";
-
-                title.textContent =
-                    photo.title || "BKDA Gallery";
-
-
-                const description =
-                    document.createElement("div");
-
-                description.className =
-                    "gallery-description";
-
-                description.textContent =
-                    photo.description || "";
+        card.className =
+            "gallery-card";
 
 
-                const date =
-                    document.createElement("div");
+        const image =
+            document.createElement("img");
 
-                date.className =
-                    "gallery-date";
+        image.className =
+            "gallery-image";
 
-                if (photo.date) {
+        image.src =
+            photo.imageUrl || "";
 
-                    date.textContent =
-                        "📅 " + formatDate(photo.date);
+        image.alt =
+            photo.title ||
+            "BKDA Gallery Photo";
 
-                }
+        image.loading =
+            "lazy";
 
 
-                info.appendChild(title);
-                info.appendChild(description);
-                info.appendChild(date);
+        const info =
+            document.createElement("div");
 
-                card.appendChild(image);
-                card.appendChild(info);
+        info.className =
+            "gallery-info";
 
-                galleryGrid.appendChild(card);
 
-            });
+        const title =
+            document.createElement("div");
 
-        },
+        title.className =
+            "gallery-title";
 
-        (error) => {
+        title.textContent =
+            photo.title ||
+            "Untitled Photo";
+
+
+        const description =
+            document.createElement("div");
+
+        description.className =
+            "gallery-description";
+
+        description.textContent =
+            photo.description ||
+            "No description";
+
+
+        const date =
+            document.createElement("div");
+
+        date.className =
+            "gallery-date";
+
+        date.textContent =
+            photo.date
+                ? "📅 " + formatDate(photo.date)
+                : "";
+
+
+        const deleteButton =
+            document.createElement("button");
+
+        deleteButton.className =
+            "delete-btn";
+
+        deleteButton.textContent =
+            "🗑️ Delete Photo";
+
+
+        deleteButton.onclick = () => {
+
+            deleteGalleryPhoto(
+                photo.id,
+                photo.title
+            );
+
+        };
+
+
+        info.appendChild(title);
+
+        info.appendChild(description);
+
+        info.appendChild(date);
+
+        info.appendChild(deleteButton);
+
+
+        card.appendChild(image);
+
+        card.appendChild(info);
+
+
+        grid.appendChild(card);
+
+    }
+
+
+    /* =========================
+       DELETE PHOTO
+    ========================= */
+
+    async function deleteGalleryPhoto(
+        galleryId,
+        title
+    ) {
+
+        const confirmed =
+            confirm(
+                `Delete "${title || "this photo"}"?\n\nThis will remove the photo information from the Gallery.`
+            );
+
+
+        if (!confirmed) {
+            return;
+        }
+
+
+        try {
+
+            await deleteDoc(
+                doc(
+                    db,
+                    "gallery",
+                    galleryId
+                )
+            );
+
+
+            alert(
+                "✅ Gallery photo deleted."
+            );
+
+
+        } catch (error) {
 
             console.error(
-                "Gallery loading error:",
+                "Delete error:",
                 error
             );
 
-            loadingMessage.style.display = "none";
-
-            errorMessage.style.display = "block";
+            alert(
+                "❌ Unable to delete photo: " +
+                error.message
+            );
 
         }
-    );
+
+    }
 
 
-    function formatDate(dateString) {
+    /* =========================
+       OPEN MODAL
+    ========================= */
+
+    function openGalleryModal() {
+
+        document.getElementById(
+            "galleryModal"
+        ).style.display = "flex";
+
+    }
+
+
+    /* =========================
+       CLOSE MODAL
+    ========================= */
+
+    function closeGalleryModal() {
+
+        document.getElementById(
+            "galleryModal"
+        ).style.display = "none";
+
+    }
+
+
+    /* =========================
+       UPLOAD PHOTO
+    ========================= */
+
+    async function uploadGalleryPhoto() {
+
+        const file =
+            document.getElementById(
+                "galleryFile"
+            ).files[0];
+
+
+        const title =
+            document.getElementById(
+                "galleryTitle"
+            ).value.trim();
+
+
+        const description =
+            document.getElementById(
+                "galleryDescription"
+            ).value.trim();
+
+
+        const date =
+            document.getElementById(
+                "galleryDate"
+            ).value;
+
+
+        if (!file) {
+
+            alert(
+                "Please choose a photo."
+            );
+
+            return;
+
+        }
+
+
+        if (!title) {
+
+            alert(
+                "Please enter a photo title."
+            );
+
+            return;
+
+        }
+
+
+        const allowedTypes = [
+
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+
+        ];
+
+
+        if (
+            !allowedTypes.includes(
+                file.type
+            )
+        ) {
+
+            alert(
+                "Only JPG, PNG or WebP images are allowed."
+            );
+
+            return;
+
+        }
+
+
+        const formData =
+            new FormData();
+
+
+        formData.append(
+            "file",
+            file
+        );
+
+        formData.append(
+            "title",
+            title
+        );
+
+        formData.append(
+            "description",
+            description
+        );
+
+        formData.append(
+            "date",
+            date
+        );
+
+
+        try {
+
+            alert(
+                "Uploading photo..."
+            );
+
+
+            const response =
+                await fetch(
+                    GALLERY_WORKER_URL,
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+
+            const result =
+                await response.json();
+
+
+            if (
+                !response.ok ||
+                !result.success
+            ) {
+
+                throw new Error(
+                    result.error ||
+                    "Upload failed."
+                );
+
+            }
+
+
+            /* SAVE PHOTO INFORMATION */
+
+            await addDoc(
+                collection(
+                    db,
+                    "gallery"
+                ),
+                {
+
+                    title:
+                        title,
+
+                    description:
+                        description,
+
+                    date:
+                        date,
+
+                    imagePath:
+                        result.path,
+
+                    imageUrl:
+                        "https://bindasskarate.github.io/bindass-karate-do-academy/" +
+                        result.path,
+
+                    createdAt:
+                        serverTimestamp()
+
+                }
+            );
+
+
+            alert(
+                "✅ Photo uploaded successfully!"
+            );
+
+
+            /* CLEAR FORM */
+
+            document.getElementById(
+                "galleryFile"
+            ).value = "";
+
+            document.getElementById(
+                "galleryTitle"
+            ).value = "";
+
+            document.getElementById(
+                "galleryDescription"
+            ).value = "";
+
+            document.getElementById(
+                "galleryDate"
+            ).value = "";
+
+
+            closeGalleryModal();
+
+
+        } catch (error) {
+
+            console.error(
+                "Gallery upload error:",
+                error
+            );
+
+
+            alert(
+                "❌ Upload failed: " +
+                error.message
+            );
+
+        }
+
+    }
+
+
+    /* =========================
+       DATE FORMAT
+    ========================= */
+
+    function formatDate(
+        dateString
+    ) {
 
         if (!dateString) {
             return "";
         }
 
-        const date =
-            new Date(dateString + "T00:00:00");
 
-        if (isNaN(date.getTime())) {
+        const date =
+            new Date(
+                dateString +
+                "T00:00:00"
+            );
+
+
+        if (
+            isNaN(
+                date.getTime()
+            )
+        ) {
+
             return dateString;
+
         }
+
 
         return date.toLocaleDateString(
             "en-IN",
@@ -404,7 +991,22 @@
                 year: "numeric"
             }
         );
+
     }
+
+
+    /* =========================
+       MAKE FUNCTIONS AVAILABLE
+    ========================= */
+
+    window.openGalleryModal =
+        openGalleryModal;
+
+    window.closeGalleryModal =
+        closeGalleryModal;
+
+    window.uploadGalleryPhoto =
+        uploadGalleryPhoto;
 
 </script>
 
