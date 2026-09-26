@@ -1461,58 +1461,10 @@ body.dark-theme td {
         display: block;
     }
 }
-/* Keep fee amounts black in dark mode */
-body.dark-theme #feesSection .amount,
-body.dark-theme #feesSection .fee-amount,
-body.dark-theme #feesSection .pending-amount,
-body.dark-theme #feesSection .paid-amount,
-body.dark-theme #feesSection .due-amount {
-    color: #000 !important;
-}
-/* =========================
-   DARK THEME - FEES FIX
-========================= */
+/* FEES - KEEP AMOUNT NUMBERS BLACK IN DARK MODE */
 
-body.dark-theme #feesSection {
-    color: #fff;
-}
-
-body.dark-theme #feesSection .fee-card,
-body.dark-theme #feesSection .payment-card,
-body.dark-theme #feesSection .fee-item {
-    color: #fff;
-}
-
-body.dark-theme #feesSection strong,
-body.dark-theme #feesSection b,
-body.dark-theme #feesSection h3,
-body.dark-theme #feesSection h4 {
-    color: #fff;
-}
-
-body.dark-theme #feesSection .amount,
-body.dark-theme #feesSection .fee-amount,
-body.dark-theme #feesSection .pending-amount,
-body.dark-theme #feesSection .paid-amount,
-body.dark-theme #feesSection .due-amount {
-    color: #fff !important;
-}
-
-/* Payment/pending text */
-body.dark-theme #feesSection span,
-body.dark-theme #feesSection p {
-    color: #ddd;
-}
-
-/* Keep important status amounts clearly visible */
-body.dark-theme #feesSection .pending,
-body.dark-theme #feesSection [class*="pending"] {
-    color: #ffb3b3 !important;
-}
-
-body.dark-theme #feesSection .paid,
-body.dark-theme #feesSection [class*="paid"] {
-    color: #8ff0b0 !important;
+body.dark-theme #feesSection .fee-stat strong {
+    color: #111827 !important;
 }
 
 </style>
