@@ -610,11 +610,10 @@
             </li>
 
             <li>
-                <button onclick="showMessage('Gallery & Events')">
-                    🖼️ &nbsp; Gallery & Events
-                </button>
-            </li>
-
+    <button onclick="openGalleryModal()">
+        🖼️ &nbsp; Gallery & Events
+    </button>
+</li>
         </ul>
 
 
@@ -956,6 +955,120 @@
         </div>
 
     </main>
+<!-- GALLERY MODAL -->
+<div id="galleryModal" style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.8);
+    z-index:9999;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+">
+    <div style="
+        width:100%;
+        max-width:500px;
+        background:#151515;
+        border:1px solid #333;
+        border-radius:16px;
+        padding:25px;
+    ">
+        <h2>🖼️ Add Gallery Photo</h2>
+
+        <input
+            id="galleryFile"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            style="
+                width:100%;
+                margin-top:15px;
+                padding:12px;
+                background:#111;
+                color:white;
+                border:1px solid #444;
+                border-radius:9px;
+            "
+        >
+
+        <input
+            id="galleryTitle"
+            type="text"
+            placeholder="Photo title"
+            style="
+                width:100%;
+                padding:13px;
+                margin-top:10px;
+                border-radius:9px;
+                border:1px solid #444;
+                background:#111;
+                color:white;
+            "
+        >
+
+        <textarea
+            id="galleryDescription"
+            placeholder="Description"
+            rows="4"
+            style="
+                width:100%;
+                padding:13px;
+                margin-top:10px;
+                border-radius:9px;
+                border:1px solid #444;
+                background:#111;
+                color:white;
+            "
+        ></textarea>
+
+        <input
+            id="galleryDate"
+            type="date"
+            style="
+                width:100%;
+                padding:13px;
+                margin-top:10px;
+                border-radius:9px;
+                border:1px solid #444;
+                background:#111;
+                color:white;
+            "
+        >
+
+        <button
+            onclick="uploadGalleryPhoto()"
+            style="
+                width:100%;
+                margin-top:12px;
+                padding:13px;
+                border:0;
+                border-radius:9px;
+                background:#e50914;
+                color:white;
+                font-weight:bold;
+                cursor:pointer;
+            "
+        >
+            📤 Upload & Publish
+        </button>
+
+        <button
+            onclick="closeGalleryModal()"
+            style="
+                width:100%;
+                margin-top:10px;
+                padding:12px;
+                border:0;
+                border-radius:9px;
+                background:#292929;
+                color:white;
+                cursor:pointer;
+            "
+        >
+            Cancel
+        </button>
+    </div>
+</div>
 
 <!-- NOTICE MODAL -->
 
@@ -1518,6 +1631,100 @@ function loadAdminNotices() {
     );
 
 }
+const GALLERY_WORKER_URL =
+    "https://bkda-gallery-upload.aligaming8976.workers.dev";
+    
+function openGalleryModal() {
+    document.getElementById("galleryModal").style.display = "flex";
+}
+
+function closeGalleryModal() {
+    document.getElementById("galleryModal").style.display = "none";
+}
+
+async function uploadGalleryPhoto() {
+
+    const file = document.getElementById("galleryFile").files[0];
+    const title = document.getElementById("galleryTitle").value.trim();
+    const description =
+        document.getElementById("galleryDescription").value.trim();
+    const date = document.getElementById("galleryDate").value;
+
+    if (!file) {
+        alert("Please choose a photo.");
+        return;
+    }
+
+    if (!title) {
+        alert("Please enter a photo title.");
+        return;
+    }
+
+    const formData = new FormData();
+
+    formData.append("file", file);
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("date", date);
+
+    try {
+
+        alert("Uploading photo...");
+
+        const response = await fetch(
+            GALLERY_WORKER_URL,
+            {
+                method: "POST",
+                body: formData
+            }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(
+                result.error || "Upload failed."
+            );
+        }
+
+        await addDoc(
+            collection(db, "gallery"),
+            {
+                title: title,
+                description: description,
+                date: date,
+                imagePath: result.path,
+                imageUrl:
+                    "https://bindasskarate.github.io/bindass-karate-do-academy/" +
+                    result.path,
+                createdAt: serverTimestamp()
+            }
+        );
+
+        alert("✅ Photo uploaded successfully.");
+
+        document.getElementById("galleryFile").value = "";
+        document.getElementById("galleryTitle").value = "";
+        document.getElementById("galleryDescription").value = "";
+        document.getElementById("galleryDate").value = "";
+
+        closeGalleryModal();
+
+    } catch (error) {
+
+        console.error("Gallery upload error:", error);
+
+        alert(
+            "❌ Upload failed: " +
+            error.message
+        );
+    }
+}
+
+window.openGalleryModal = openGalleryModal;
+window.closeGalleryModal = closeGalleryModal;
+window.uploadGalleryPhoto = uploadGalleryPhoto;
+
     </script>
 
 </body>
