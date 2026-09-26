@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Gallery | Bindass Karate Do Academy</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #0b0b0b;
+            color: #fff;
+        }
+
+        header {
+            background: #111;
+            border-bottom: 1px solid #292929;
+            padding: 18px 25px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #e50914;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            color: #fff;
+            background: #e50914;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 55px 20px 35px;
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .hero h1 span {
+            color: #e50914;
+        }
+
+        .hero p {
+            color: #aaa;
+            font-size: 16px;
+        }
+
+        .gallery-container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        #galleryGrid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+        }
+
+        .gallery-card {
+            background: #151515;
+            border: 1px solid #292929;
+            border-radius: 14px;
+            overflow: hidden;
+            transition: transform .2s, border-color .2s;
+        }
+
+        .gallery-card:hover {
+            transform: translateY(-4px);
+            border-color: #e50914;
+        }
+
+        .gallery-image {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            display: block;
+            background: #111;
+        }
+
+        .gallery-info {
+            padding: 17px;
+        }
+
+        .gallery-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .gallery-description {
+            color: #aaa;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .gallery-date {
+            color: #e50914;
+            font-size: 13px;
+            margin-top: 12px;
+        }
+
+        .message {
+            text-align: center;
+            padding: 60px 20px;
+            color: #aaa;
+            font-size: 17px;
+        }
+
+        .error {
+            color: #ff5c5c;
+        }
+
+        @media (max-width: 800px) {
+            #galleryGrid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .hero h1 {
+                font-size: 34px;
+            }
+        }
+
+        @media (max-width: 550px) {
+            #galleryGrid {
+                grid-template-columns: 1fr;
+            }
+
+            .gallery-image {
+                height: 230px;
+            }
+
+            .header-inner {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="header-inner">
+        <div class="logo">
+            🥋 BKDA
+        </div>
+
+        <a href="index.html" class="back-btn">
+            ← Back to Home
+        </a>
+    </div>
+</header>
+
+<section class="hero">
+    <h1>Our <span>Gallery</span></h1>
+    <p>Moments, training, competitions and events from Bindass Karate Do Academy</p>
+</section>
+
+<main class="gallery-container">
+
+    <div id="loadingMessage" class="message">
+        Loading gallery...
+    </div>
+
+    <div id="galleryGrid"></div>
+
+    <div id="emptyMessage" class="message" style="display:none;">
+        No gallery photos available yet.
+    </div>
+
+    <div id="errorMessage" class="message error" style="display:none;">
+        Unable to load the gallery.
+    </div>
+
+</main>
+
+<script type="module">
+
+    import { initializeApp }
+        from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+    import {
+        getFirestore,
+        collection,
+        onSnapshot
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
+    // SAME FIREBASE CONFIG AS YOUR ADMIN PANEL
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "bindass-karate-do-academy.firebaseapp.com",
+        projectId: "bindass-karate-do-academy",
+        storageBucket: "bindass-karate-do-academy.firebasestorage.app",
+        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    };
+
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+
+    const galleryGrid =
+        document.getElementById("galleryGrid");
+
+    const loadingMessage =
+        document.getElementById("loadingMessage");
+
+    const emptyMessage =
+        document.getElementById("emptyMessage");
+
+    const errorMessage =
+        document.getElementById("errorMessage");
+
+
+    onSnapshot(
+        collection(db, "gallery"),
+
+        (snapshot) => {
+
+            loadingMessage.style.display = "none";
+
+            galleryGrid.innerHTML = "";
+
+            if (snapshot.empty) {
+
+                emptyMessage.style.display = "block";
+
+                return;
+            }
+
+            emptyMessage.style.display = "none";
+
+
+            const photos = [];
+
+            snapshot.forEach((doc) => {
+
+                photos.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
+
+            });
+
+
+            photos.sort((a, b) => {
+
+                const dateA =
+                    a.date || "";
+
+                const dateB =
+                    b.date || "";
+
+                return dateB.localeCompare(dateA);
+
+            });
+
+
+            photos.forEach((photo) => {
+
+                if (!photo.imageUrl) {
+                    return;
+                }
+
+
+                const card =
+                    document.createElement("div");
+
+                card.className =
+                    "gallery-card";
+
+
+                const image =
+                    document.createElement("img");
+
+                image.className =
+                    "gallery-image";
+
+                image.src =
+                    photo.imageUrl;
+
+                image.alt =
+                    photo.title || "BKDA Gallery Photo";
+
+                image.loading =
+                    "lazy";
+
+
+                const info =
+                    document.createElement("div");
+
+                info.className =
+                    "gallery-info";
+
+
+                const title =
+                    document.createElement("div");
+
+                title.className =
+                    "gallery-title";
+
+                title.textContent =
+                    photo.title || "BKDA Gallery";
+
+
+                const description =
+                    document.createElement("div");
+
+                description.className =
+                    "gallery-description";
+
+                description.textContent =
+                    photo.description || "";
+
+
+                const date =
+                    document.createElement("div");
+
+                date.className =
+                    "gallery-date";
+
+                if (photo.date) {
+
+                    date.textContent =
+                        "📅 " + formatDate(photo.date);
+
+                }
+
+
+                info.appendChild(title);
+                info.appendChild(description);
+                info.appendChild(date);
+
+                card.appendChild(image);
+                card.appendChild(info);
+
+                galleryGrid.appendChild(card);
+
+            });
+
+        },
+
+        (error) => {
+
+            console.error(
+                "Gallery loading error:",
+                error
+            );
+
+            loadingMessage.style.display = "none";
+
+            errorMessage.style.display = "block";
+
+        }
+    );
+
+
+    function formatDate(dateString) {
+
+        if (!dateString) {
+            return "";
+        }
+
+        const date =
+            new Date(dateString + "T00:00:00");
+
+        if (isNaN(date.getTime())) {
+            return dateString;
+        }
+
+        return date.toLocaleDateString(
+            "en-IN",
+            {
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+            }
+        );
+    }
+
+</script>
+
+</body>
+</html>
