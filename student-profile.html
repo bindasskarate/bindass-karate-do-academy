@@ -2559,6 +2559,11 @@ async function loadStudentGallery() {
         `;
     }
 }
+
+async function loadStudentProfile() {
+
+    try {
+
         /* =================================================
            STUDENT DOCUMENT
         ================================================= */
@@ -2606,7 +2611,8 @@ async function loadStudentGallery() {
 
             return;
 
-        }
+            }
+    
 
 
         const student =
@@ -3929,19 +3935,16 @@ studentData =
 
             </div>
 
-        `;
+                `;
 
+        await loadStudentGallery();
 
-       
-
-
-     catch (error) {
+    } catch (error) {
 
         console.error(
             "Profile loading error:",
             error
         );
-
 
         profile.innerHTML = `
 
@@ -3972,33 +3975,12 @@ studentData =
                 </div>
 
             </div>
-<div class="section" id="gallerySection">
 
-    <div class="section-title">
-        <div class="section-icon">🖼️</div>
-        <h3>Academy Gallery</h3>
-    </div>
-
-    <div id="studentGalleryGrid"
-         style="
-            display:grid;
-            grid-template-columns:
-                repeat(auto-fill,minmax(220px,1fr));
-            gap:16px;
-         ">
-
-        <div class="placeholder">
-            Loading gallery...
-        </div>
-
-    </div>
-
-</div>
         `;
-        await loadStudentGallery();
+
+    }
 
 }
-
 
 
 
