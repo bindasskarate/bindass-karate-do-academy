@@ -1023,7 +1023,37 @@ body {
 
 
 /* SIDEBAR */
+.sidebar-close {
+    display: none;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 9999;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 8px;
+    background: #e50914;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
 
+    .sidebar.open {
+        transform: translateX(0);
+    }
+}
+@media (max-width: 768px) {
+    .sidebar-close {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
 .sidebar {
     position: fixed;
     left: 0;
@@ -1450,7 +1480,12 @@ body.dark-theme td {
 
 <!-- SIDEBAR -->
 <aside class="sidebar" id="studentSidebar">
-<button class="sidebar-close" onclick="toggleSidebar()">✕</button>
+<button
+    type="button"
+    class="sidebar-close"
+    id="sidebarCloseBtn">
+    ✕
+</button>
     <div class="sidebar-brand">
 
         <img
