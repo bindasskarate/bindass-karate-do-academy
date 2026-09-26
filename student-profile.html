@@ -1343,6 +1343,78 @@ body {
 
 }
 
+/* ADMIN STYLE DARK THEME */
+
+body.dark-theme {
+    background: #090909;
+    color: #fff;
+}
+
+body.dark-theme .student-main {
+    background:
+        radial-gradient(
+            circle at 85% 10%,
+            rgba(229, 9, 20, .08),
+            transparent 25%
+        ),
+        #090909;
+}
+
+body.dark-theme .section,
+body.dark-theme .profile-hero {
+    background: linear-gradient(
+        145deg,
+        #171717,
+        #101010
+    );
+    border-color: #292929;
+    color: #fff;
+}
+
+body.dark-theme .sidebar {
+    background: #0d0d0d;
+    border-right-color: #292929;
+}
+
+body.dark-theme .nav-item {
+    color: #aaa;
+}
+
+body.dark-theme .nav-item:hover,
+body.dark-theme .nav-item.active {
+    background: #241010;
+    color: #fff;
+}
+
+body.dark-theme h1,
+body.dark-theme h2,
+body.dark-theme h3,
+body.dark-theme h4 {
+    color: #fff;
+}
+
+body.dark-theme p,
+body.dark-theme small {
+    color: #888;
+}
+
+body.dark-theme .table-wrap {
+    background: #111;
+    border-color: #292929;
+}
+
+body.dark-theme table {
+    color: #fff;
+}
+
+body.dark-theme th {
+    background: #181818;
+}
+
+body.dark-theme td {
+    border-color: #292929;
+}
+
 </style>
 
 </head>
@@ -1426,7 +1498,9 @@ body {
             🔐
             <span>Change Password</span>
         </button>
-
+<button class="nav-item" id="themeToggleBtn" onclick="toggleTheme()">
+    🌙 <span>Dark Mode</span>
+</button>
     </nav>
 
 
@@ -1624,6 +1698,45 @@ document
 
         }
     );
+function toggleTheme() {
+
+    document.body.classList.toggle("dark-theme");
+
+    const dark =
+        document.body.classList.contains("dark-theme");
+
+    localStorage.setItem(
+        "studentTheme",
+        dark ? "dark" : "light"
+    );
+
+    const button =
+        document.getElementById("themeToggleBtn");
+
+    if (button) {
+        button.innerHTML =
+            dark
+                ? "☀️ <span>Light Mode</span>"
+                : "🌙 <span>Dark Mode</span>";
+    }
+}
+
+
+const savedTheme =
+    localStorage.getItem("studentTheme");
+
+if (savedTheme === "dark") {
+
+    document.body.classList.add("dark-theme");
+
+    const button =
+        document.getElementById("themeToggleBtn");
+
+    if (button) {
+        button.innerHTML =
+            "☀️ <span>Light Mode</span>";
+    }
+}
 
 </script>
 
